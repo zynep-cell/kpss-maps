@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Zen - Coğrafya Hafıza Merkezi</title>
+    <title>Core Zen - Dağlar Hafıza Merkezi</title>
     <style>
         :root {
             --bg-cream: #fcfbf9;
@@ -30,6 +30,31 @@
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
+        }
+
+        .nav-bar {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--champagne-gold);
+            border: 1px solid var(--champagne-gold);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            background-color: var(--champagne-gold);
+            color: var(--white);
         }
 
         h1 {
@@ -179,7 +204,6 @@
             cursor: crosshair;
         }
 
-        /* Tek bir interaktif görsel var, hep boş harita */
         #map-image {
             width: 100%;
             height: auto;
@@ -241,7 +265,6 @@
             line-height: 1.4;
         }
 
-        /* Yeni Hint (Kopya) Bölümü */
         .hint-section {
             margin-top: 40px;
             display: flex;
@@ -268,7 +291,7 @@
         }
 
         .hint-image-container {
-            display: none; /* Başlangıçta gizli */
+            display: none;
             margin-top: 15px;
             width: 100%;
             border: 2px dashed var(--champagne-gold);
@@ -286,6 +309,10 @@
     </style>
 </head>
 <body>
+
+    <div class="nav-bar">
+        <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
+    </div>
 
     <h1>TÜRKİYE'NİN DAĞLARI</h1>
 
@@ -306,65 +333,74 @@
         Harita üzerinde gezinerek dağları öğrenebilirsin.
     </div>
 
-    <!-- ANA İŞLEM ZEMİNİ (SADECE BOŞ HARİTA) -->
     <div class="map-container" id="map-container" onclick="handleMapClick(event)">
-        <img id="map-image" src="daglar_bos.png.jpeg" alt="Türkiye Dağlar Boş Haritası">
+        <img id="map-image" src="daglar_bos.png.jpeg" alt="Türkiye Dağları Haritası">
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
-    <!-- KOPYA (HİNT) KÖŞESİ -->
     <div class="hint-section">
         <button class="hint-toggle-btn" onclick="toggleHint()">Dolu Haritayı (Kopya) Aç / Kapat</button>
         <div class="hint-image-container" id="hint-container">
-            <img src="daglar_dolu.png.jpeg" alt="Türkiye Dağlar Dolu Haritası">
+            <img src="daglar_dolu.png.jpeg" alt="Türkiye Dağları Dolu Haritası">
         </div>
     </div>
 
     <script>
         const mountains = [
-            { id: 'kirik_1', name: "Kaz Dağları", group: "Kırık", num: 1 },
-            { id: 'kirik_2', name: "Madra Dağı", group: "Kırık", num: 2 },
-            { id: 'kirik_3', name: "Yunt Dağı", group: "Kırık", num: 3 },
-            { id: 'kirik_4', name: "Bozdağlar", group: "Kırık", num: 4 },
-            { id: 'kirik_5', name: "Aydın Dağları", group: "Kırık", num: 5 },
-            { id: 'kirik_6', name: "Menteşe Dağları", group: "Kırık", num: 6 },
-            { id: 'kirik_7', name: "Amanos (Nur) Dağları", group: "Kırık", num: 7 },
-            { id: 'volk_1', name: "Karadağ", group: "Volkanik", num: 1 },
-            { id: 'volk_2', name: "Karacadağ (İç Anadolu)", group: "Volkanik", num: 2 },
-            { id: 'volk_3', name: "Hasan Dağı", group: "Volkanik", num: 3 },
-            { id: 'volk_4', name: "Melendiz Dağı", group: "Volkanik", num: 4 },
-            { id: 'volk_5', name: "Erciyes Dağı", group: "Volkanik", num: 5 },
-            { id: 'volk_6', name: "Karacadağ (G.Doğu)", group: "Volkanik", num: 6 },
-            { id: 'volk_7', name: "Nemrut Dağı", group: "Volkanik", num: 7 },
-            { id: 'volk_8', name: "Süphan Dağı", group: "Volkanik", num: 8 },
-            { id: 'volk_9', name: "Tendürek Dağı", group: "Volkanik", num: 9 },
-            { id: 'volk_10', name: "Ağrı Dağı", group: "Volkanik", num: 10 },
-            { id: 'volk_11', name: "Kula Volkanları", group: "Volkanik", num: 11 },
-            { id: 'kivrim_1', name: "Yıldız Dağları", group: "Kıvrım", num: 1 },
-            { id: 'kivrim_2', name: "Samanlı Dağları", group: "Kıvrım", num: 2 },
-            { id: 'kivrim_3', name: "Bolu Dağları", group: "Kıvrım", num: 3 },
-            { id: 'kivrim_4', name: "Köroğlu Dağları", group: "Kıvrım", num: 4 },
-            { id: 'kivrim_5', name: "Ilgaz Dağları", group: "Kıvrım", num: 5 },
-            { id: 'kivrim_6', name: "Küre Dağları", group: "Kıvrım", num: 6 },
-            { id: 'kivrim_7', name: "Canik Dağları", group: "Kıvrım", num: 7 },
-            { id: 'kivrim_8', name: "Giresun Dağları", group: "Kıvrım", num: 8 },
-            { id: 'kivrim_9', name: "Kaçkarlar", group: "Kıvrım", num: 9 },
-            { id: 'kivrim_10', name: "Yalnızçam Dağları", group: "Kıvrım", num: 10 },
-            { id: 'kivrim_11', name: "Allahuekber Dağları", group: "Kıvrım", num: 11 },
-            { id: 'kivrim_12', name: "Mescit Dağı", group: "Kıvrım", num: 12 },
-            { id: 'kivrim_13', name: "Mercan Dağları", group: "Kıvrım", num: 13 },
-            { id: 'kivrim_14', name: "Bey Dağları", group: "Kıvrım", num: 14 },
-            { id: 'kivrim_15', name: "Dedegöl Dağları", group: "Kıvrım", num: 15 },
-            { id: 'kivrim_16', name: "Sultan Dağları", group: "Kıvrım", num: 16 },
-            { id: 'kivrim_17', name: "Geyik Dağları", group: "Kıvrım", num: 17 },
-            { id: 'kivrim_18', name: "Bolkar Dağları", group: "Kıvrım", num: 18 },
-            { id: 'kivrim_19', name: "Aladağlar", group: "Kıvrım", num: 19 },
-            { id: 'kivrim_20', name: "Tahtalı Dağları", group: "Kıvrım", num: 20 },
-            { id: 'kivrim_21', name: "Güneydoğu Toroslar", group: "Kıvrım", num: 21 }
+            { id: 'm_1', name: "Yıldız Dağları", num: 1 },
+            { id: 'm_2', name: "Kuru Dağ", num: 2 },
+            { id: 'm_3', name: "Samanlı Dağları", num: 3 },
+            { id: 'm_4', name: "Bolu Dağı", num: 4 },
+            { id: 'm_5', name: "Suna Dağı", num: 5 },
+            { id: 'm_6', name: "Küre Dağları", num: 6 },
+            { id: 'm_7', name: "Ilgaz Dağı", num: 7 },
+            { id: 'm_8', name: "Köroğlu Dağları", num: 8 },
+            { id: 'm_9', name: "Canik Dağları", num: 9 },
+            { id: 'm_10', name: "Giresun Dağları", num: 10 },
+            { id: 'm_11', name: "Kaçkar Dağları", num: 11 },
+            { id: 'm_12', name: "Yalnızçam Dağları", num: 12 },
+            { id: 'm_13', name: "Mescit Dağı", num: 13 },
+            { id: 'm_14', name: "Çimen Dağı", num: 14 },
+            { id: 'm_15', name: "Köse Dağı", num: 15 },
+            { id: 'm_16', name: "Aras Dağları", num: 16 },
+            { id: 'm_17', name: "Allahuekber Dağları", num: 17 },
+            { id: 'm_18', name: "Mercan Dağları", num: 18 },
+            { id: 'm_19', name: "Büyük Ağrı Dağı", num: 19 },
+            { id: 'm_20', name: "Tendürek Dağı", num: 20 },
+            { id: 'm_21', name: "Süphan Dağı", num: 21 },
+            { id: 'm_22', name: "Nemrut Dağı", num: 22 },
+            { id: 'm_23', name: "Cilo (Hakkari) Dağları", num: 23 },
+            { id: 'm_24', name: "Gabar Dağı", num: 24 },
+            { id: 'm_25', name: "Mardin Dağları", num: 25 },
+            { id: 'm_26', name: "Gaziantep Plateau/Hills", num: 26 },
+            { id: 'm_27', name: "Nur (Amanos) Dağları", num: 27 },
+            { id: 'm_28', name: "Binboğa Dağları", num: 28 },
+            { id: 'm_29', name: "Tahtalı Dağları", num: 29 },
+            { id: 'm_30', name: "Aladağlar", num: 30 },
+            { id: 'm_31', name: "Bolkar Dağları", num: 31 },
+            { id: 'm_32', name: "Geyik Dağları", num: 32 },
+            { id: 'm_33', name: "Bey Dağları", num: 33 },
+            { id: 'm_34', name: "Katrancık Dağı", num: 34 },
+            { id: 'm_35', name: "Barla Dağı", num: 35 },
+            { id: 'm_36', name: "Sultan Dağları", num: 36 },
+            { id: 'm_37', name: "Emir Dağı", num: 37 },
+            { id: 'm_38', name: "Hasan Dağı", num: 38 },
+            { id: 'm_39', name: "Karacadağ", num: 39 },
+            { id: 'm_40', name: "Melendiz Dağı", num: 40 },
+            { id: 'm_41', name: "Erciyes Dağı", num: 41 },
+            { id: 'm_42', name: "Karadağ", num: 42 },
+            { id: 'm_43', name: "Sündiken Dağları", num: 43 },
+            { id: 'm_44', name: "Emir Dağı (İç)", num: 44 },
+            { id: 'm_45', name: "Kaz Dağı", num: 45 },
+            { id: 'm_46', name: "Madra Dağı", num: 46 },
+            { id: 'm_47', name: "Yunt Dağı", num: 47 },
+            { id: 'm_48', name: "Bozdağlar", num: 48 },
+            { id: 'm_49', name: "Aydın Dağları", num: 49 },
+            { id: 'm_50', name: "Menteşe Dağları", num: 50 }
         ];
 
-        let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZenV3')) || {}; // Yeni versiyon anahtarı
+        let savedCoords = JSON.parse(localStorage.getItem('dagCoordsCoreZen')) || {};
         let currentMode = 'learn';
         let currentTestMountain = null;
         let activeSetupMountainId = null;
@@ -404,7 +440,7 @@
                     marker.classList.remove('test-btn');
 
                     marker.addEventListener('mouseenter', () => {
-                        tooltip.innerHTML = `<span style="color:var(--champagne-gold)">${mountain.group} ${mountain.num}</span><br>${mountain.name}`;
+                        tooltip.innerHTML = `<span style="color:var(--champagne-gold)">Dağ No: ${mountain.num}</span><br>${mountain.name}`;
                         tooltip.style.left = (savedCoords[mountain.id].x + 1.5) + '%';
                         tooltip.style.top = (savedCoords[mountain.id].y - 3) + '%';
                         tooltip.style.opacity = '1';
@@ -443,7 +479,7 @@
             mountains.forEach(mountain => {
                 const pill = document.createElement('div');
                 pill.className = 'setup-pill';
-                pill.textContent = `${mountain.group} ${mountain.num} - ${mountain.name}`;
+                pill.textContent = `${mountain.num} - ${mountain.name}`;
                 
                 if (savedCoords[mountain.id]) pill.classList.add('marked');
                 if (activeSetupMountainId === mountain.id) pill.classList.add('active-target');
@@ -462,7 +498,7 @@
         function updateSetupStatus() {
             if (activeSetupMountainId) {
                 const current = mountains.find(m => m.id === activeSetupMountainId);
-                statusBar.innerHTML = `Lütfen haritada tıkla: <strong style="color: var(--champagne-gold); font-size: 20px;">${current.group} ${current.num} (${current.name})</strong>`;
+                statusBar.innerHTML = `Lütfen haritada tıkla: <strong style="color: var(--champagne-gold); font-size: 20px;">No: ${current.num} (${current.name})</strong>`;
                 statusBar.style.color = "var(--text-dark)";
             } else {
                 statusBar.innerHTML = `Yukarıdaki listeden bir dağ seç ve haritadaki yerini tıkla. Yeşil olanlar işaretlenmiş demektir.`;
@@ -487,7 +523,6 @@
 
             if (mode === 'learn') {
                 mapContainer.classList.remove('setup-active');
-                
                 statusBar.innerHTML = Object.keys(savedCoords).length === 0 
                     ? "Önce <strong>Yer Belirleme</strong> moduna girerek dağların konumlarını işaretlemelisin." 
                     : "Harita üzerinde gezinerek dağları öğrenebilirsin.";
@@ -499,13 +534,10 @@
                     statusBar.style.color = "var(--pastel-pink)";
                     return;
                 }
-                
                 startTest();
             } else if (mode === 'setup') {
                 mapContainer.classList.add('setup-active');
-                
                 if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked() || mountains[0].id;
-                
                 renderSetupPanel();
                 updateSetupStatus();
             }
@@ -516,14 +548,13 @@
             if (currentMode !== 'setup' || !activeSetupMountainId) return;
 
             const rect = mapContainer.getBoundingClientRect();
-            
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
 
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
             savedCoords[activeSetupMountainId] = { x: x, y: y };
-            localStorage.setItem('daglarCoordsCoreZenV3', JSON.stringify(savedCoords));
+            localStorage.setItem('dagCoordsCoreZen', JSON.stringify(savedCoords));
             
             activeSetupMountainId = findNextUnmarked();
             
@@ -535,7 +566,7 @@
         function clearSelected() {
             if (activeSetupMountainId && savedCoords[activeSetupMountainId]) {
                 delete savedCoords[activeSetupMountainId];
-                localStorage.setItem('daglarCoordsCoreZenV3', JSON.stringify(savedCoords));
+                localStorage.setItem('dagCoordsCoreZen', JSON.stringify(savedCoords));
                 renderSetupPanel();
                 updateSetupStatus();
                 initMap();
@@ -545,7 +576,7 @@
         function resetAll() {
             if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
                 savedCoords = {};
-                localStorage.removeItem('daglarCoordsCoreZenV3');
+                localStorage.removeItem('dagCoordsCoreZen');
                 activeSetupMountainId = mountains[0].id;
                 renderSetupPanel();
                 updateSetupStatus();
