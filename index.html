@@ -158,7 +158,7 @@
             width: 100%;
             height: auto;
             display: block;
-            pointer-events: none; /* Tıklamalar container'a düşsün */
+            pointer-events: none;
         }
 
         #markers-layer {
@@ -185,15 +185,16 @@
             z-index: 10;
         }
 
-        /* Test modu için ekstra vurgu */
+        /* Test modu için ekstra ince vurgu */
         .mountain-marker.test-btn {
             background-color: transparent;
-            border: 2px solid transparent;
+            border: 1px solid transparent; /* Sınırı incelttik */
         }
         
         .mountain-marker.test-btn:hover {
-            border: 2px solid var(--light-blue);
-            background-color: rgba(184, 216, 224, 0.3);
+            border: 1px solid var(--light-blue);
+            background-color: rgba(184, 216, 224, 0.4);
+            transform: translate(-50%, -50%) scale(1.1); /* Büyümeyi azalttık */
         }
 
         .tooltip {
@@ -286,11 +287,10 @@
             { id: 'kivrim_21', name: "Güneydoğu Toroslar", group: "Kıvrım", num: 21 }
         ];
 
-        // Yeni anahtar kullandım, eski hatalı veriler karışmayacak
         let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZenV2')) || {};
         let currentMode = 'learn';
         let currentTestMountain = null;
-        let activeSetupMountainId = null; // Şu an hangisi seçili?
+        let activeSetupMountainId = null;
 
         const mapImage = document.getElementById('map-image');
         const markersLayer = document.getElementById('markers-layer');
@@ -311,8 +311,8 @@
                 marker.style.top = savedCoords[mountain.id].y + '%';
                 
                 if (currentMode === 'learn') {
-                    marker.style.width = '18px';
-                    marker.style.height = '18px';
+                    marker.style.width = '14px'; /* Öğrenme modu için de biraz küçülttük */
+                    marker.style.height = '14px';
                     marker.style.opacity = '1';
                     marker.style.backgroundColor = "rgba(200, 179, 130, 0.7)";
                     marker.classList.remove('test-btn');
@@ -328,10 +328,10 @@
                         tooltip.style.opacity = '0';
                     });
                 } else if (currentMode === 'test') {
-                    // Alanı küçülttük (25px) ki birbirine geçmesin
-                    marker.style.width = '25px'; 
-                    marker.style.height = '25px';
-                    marker.style.opacity = '1'; // CSS ile şeffaf yapıp üzerine gelince mavi hover verdik
+                    // Butonları yuvarlaklara tam oturacak şekilde küçülttük
+                    marker.style.width = '14px'; 
+                    marker.style.height = '14px';
+                    marker.style.opacity = '1'; 
                     marker.classList.add('test-btn'); 
                     marker.style.zIndex = '10'; 
 
@@ -366,8 +366,8 @@
                 pill.onclick = () => {
                     activeSetupMountainId = mountain.id;
                     updateSetupStatus();
-                    renderSetupPanel(); // Pill renklerini güncelle
-                    initMap(); // Haritadaki noktayı sarart (eğer varsa)
+                    renderSetupPanel();
+                    initMap(); 
                 };
 
                 setupPanel.appendChild(pill);
@@ -380,7 +380,7 @@
                 statusBar.innerHTML = `Lütfen haritada tıkla: <strong style="color: var(--champagne-gold); font-size: 20px;">${current.group} ${current.num} (${current.name})</strong>`;
                 statusBar.style.color = "var(--text-dark)";
             } else {
-                statusBar.innerHTML = `Yukarıdaki listeden bir dağ seç ve haritadaki yerini tıkla. Yeşil olanlar işaretlenmiş demektir. (Yanlış işaretlediğini tekrar seçip tıklayarak düzeltebilirsin.)`;
+                statusBar.innerHTML = `Yukarıdaki listeden bir dağ seç ve haritadaki yerini tıkla. Yeşil olanlar işaretlenmiş demektir.`;
                 statusBar.style.color = "var(--text-dark)";
             }
         }
@@ -419,7 +419,6 @@
                 mapContainer.classList.add('setup-active');
                 mapImage.src = 'daglar_dolu.png.jpeg';
                 
-                // Eğer seçili yoksa, işaretlenmemiş ilk dağı seç
                 if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked();
                 
                 renderSetupPanel();
@@ -431,10 +430,8 @@
         function handleMapClick(event) {
             if (currentMode !== 'setup' || !activeSetupMountainId) return;
 
-            // KAYMA SORUNU ÇÖZÜMÜ: Koordinatları doğrudan resmin bounding box'ı üzerinden alıyoruz.
             const rect = mapImage.getBoundingClientRect();
             
-            // Eğer tıklama resmin dışındaysa (örn. alttaki boşluk) yoksay
             if (event.clientY < rect.top || event.clientY > rect.bottom || event.clientX < rect.left || event.clientX > rect.right) {
                 return; 
             }
@@ -445,7 +442,6 @@
             savedCoords[activeSetupMountainId] = { x: x, y: y };
             localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
             
-            // Sıradaki işaretsiz dağı otomatik seç (hızlı işaretleme için)
             activeSetupMountainId = findNextUnmarked();
             
             renderSetupPanel();
@@ -480,7 +476,6 @@
             }
         }
 
-        // Başlangıç
         setMode('learn');
     </script>
 </body>
