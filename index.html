@@ -79,7 +79,6 @@
             background-color: var(--bg-cream);
         }
 
-        /* Düzenleme moduna özel silme butonları */
         .setup-actions {
             display: none;
             gap: 15px;
@@ -103,7 +102,6 @@
             color: var(--white);
         }
 
-        /* Akıllı Kurulum Paneli */
         .setup-panel {
             display: none;
             flex-wrap: wrap;
@@ -172,6 +170,10 @@
             background-color: var(--white);
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             cursor: default;
+            /* Kayma sorununu çözen anahtar kodlar */
+            line-height: 0;
+            font-size: 0;
+            display: block;
         }
 
         .map-container.setup-active {
@@ -191,6 +193,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            pointer-events: none; /* Tıklamaların direkt map-container'a geçmesini sağlar */
         }
 
         .mountain-marker {
@@ -198,9 +201,10 @@
             background-color: rgba(200, 179, 130, 0.5);
             border: 1px solid var(--champagne-gold);
             border-radius: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Tam merkeze oturtur */
             cursor: pointer;
             transition: all 0.2s ease;
+            pointer-events: auto; /* İşaretçilerin tıklanabilir kalmasını sağlar */
         }
 
         .mountain-marker:hover {
@@ -209,7 +213,6 @@
             z-index: 10;
         }
 
-        /* Test modu için ekstra ince vurgu */
         .mountain-marker.test-btn {
             background-color: transparent;
             border: 1px solid transparent;
@@ -235,6 +238,7 @@
             border-left: 3px solid var(--sage-green);
             z-index: 20;
             white-space: nowrap;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -248,16 +252,12 @@
         <button id="btn-setup" class="main-btn setup-mode" onclick="setMode('setup')">Yer Belirleme (Düzenle)</button>
     </div>
 
-    <!-- Silme işlemleri için panel -->
     <div class="setup-actions" id="setup-actions">
         <button class="action-btn" onclick="clearSelected()">Seçili Olanı Sil</button>
         <button class="action-btn" onclick="resetAll()">Tümünü Sıfırla</button>
     </div>
 
-    <!-- Akıllı Kurulum Paneli -->
-    <div class="setup-panel" id="setup-panel">
-        <!-- Etiketler JavaScript ile buraya eklenecek -->
-    </div>
+    <div class="setup-panel" id="setup-panel"></div>
 
     <div class="status-bar" id="status-bar">
         Harita üzerinde gezinerek dağları öğrenebilirsin.
@@ -350,8 +350,9 @@
 
                     marker.addEventListener('mouseenter', () => {
                         tooltip.innerHTML = `<span style="color:var(--champagne-gold)">${mountain.group} ${mountain.num}</span><br>${mountain.name}`;
+                        // Tooltip'i hafif yukarı ve sağa kaydır
                         tooltip.style.left = (savedCoords[mountain.id].x + 1.5) + '%';
-                        tooltip.style.top = (savedCoords[mountain.id].y - 1.5) + '%';
+                        tooltip.style.top = (savedCoords[mountain.id].y - 3) + '%';
                         tooltip.style.opacity = '1';
                     });
 
@@ -461,14 +462,15 @@
         function handleMapClick(event) {
             if (currentMode !== 'setup' || !activeSetupMountainId) return;
 
-            const rect = mapImage.getBoundingClientRect();
+            // Kayma problemini kökten çözen sağlam hesaplama yöntemi
+            const rect = mapContainer.getBoundingClientRect();
             
-            if (event.clientY < rect.top || event.clientY > rect.bottom || event.clientX < rect.left || event.clientX > rect.right) {
-                return; 
-            }
-
+            // Tıklanan noktanın yüzdelik dilimini tam doğrulukla hesapla
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+            // Tıklama resmin çok dışına taşarsa (örn sağ/sol boşluklar) yoksay
+            if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
             savedCoords[activeSetupMountainId] = { x: x, y: y };
             localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
@@ -480,7 +482,6 @@
             initMap(); 
         }
 
-        // --- YENİ EKLENEN SİLME FONKSİYONLARI ---
         function clearSelected() {
             if (activeSetupMountainId && savedCoords[activeSetupMountainId]) {
                 delete savedCoords[activeSetupMountainId];
@@ -501,7 +502,6 @@
                 initMap();
             }
         }
-        // ----------------------------------------
 
         function startTest() {
             const markedMountains = mountains.filter(m => savedCoords[m.id]);
