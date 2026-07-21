@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Zen - Türkiye'nin İlleri ve Fonksiyonel Analiz</title>
+    <title>Core Zen - Türkiye'nin İlleri, Hava Kirliliği Tipleri ve Fonksiyonel Analiz</title>
     <style>
         :root {
             --bg-cream: #fcfbf9;
@@ -139,14 +139,14 @@
             border: 1px solid #eae6df;
         }
 
-        /* SVG Türkiye Silüet Arka Planı */
+        /* Gerçek Türkiye Haritası Hatları (SVG Konturları) */
         .turkey-svg-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.18;
+            opacity: 0.22;
             pointer-events: none;
         }
 
@@ -212,10 +212,10 @@
         <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
     </div>
 
-    <h1>TÜRKİYE'NİN İLLERİ VE FONKSİYONEL ANALİZİ</h1>
+    <h1>TÜRKİYE'NİN İLLERİ VE HAVA KİRLİLİĞİ TİPLERİ</h1>
 
     <div class="info-box">
-        <p>📌 <strong>Modül Bilgisi:</strong> Türkiye'nin 81 ilinin tamamı; <span style="color: var(--sage-green); font-weight: bold;">Büyükşehirler</span> ve <span style="color: var(--champagne-gold); font-weight: bold;">Diğer İller</span> olarak ayrılmıştır. Sınavda çıkan <strong>Turizm, Ulaşım, Tarım, Sanayi, Liman</strong> fonksiyonları ile küresel örnekler (Londra, Los Angeles vb.) eklenmiştir.</p>
+        <p>📌 <strong>Modül Bilgisi:</strong> 81 il harita üzerinde tam konumlandırılmıştır. Sınavda kritik olan <strong>Londra Tipi Kirlilik</strong> (Isınma/Kömür) ve <strong>Los Angeles Tipi Kirlilik</strong> (Egzoz/Trafik/Smog) özellikleri işlenmiştir.</p>
     </div>
 
     <div class="controls">
@@ -224,115 +224,115 @@
     </div>
 
     <div class="status-bar" id="status-bar">
-        Harita üzerinde illerin üzerine gelerek fonksiyonel özellikleri ve KPSS detaylarını görebilirsin.
+        Harita üzerinde illerin üzerine gelerek kirlilik tipini ve KPSS detaylarını görebilirsin.
     </div>
 
     <div class="map-container" id="map-container">
-        <!-- Vektörel Türkiye Haritası Kroki Katmanı -->
+        <!-- Gerçek Türkiye Haritası Vektör Hatları -->
         <svg class="turkey-svg-bg" viewBox="0 0 1000 500" preserveAspectRatio="none">
-            <path d="M50,120 Q120,90 200,110 T400,100 T600,90 T800,110 Q950,120 960,180 Q970,250 900,320 Q800,380 700,360 Q600,400 500,420 Q400,390 300,380 Q200,350 120,300 Q60,250 50,120 Z" fill="#c8b382" />
+            <path d="M45,185 L50,170 L65,155 L75,145 L85,160 L100,150 L115,165 L125,150 L140,165 L155,145 L170,160 L185,145 L200,165 L220,150 L235,165 L250,155 L265,170 L285,155 L300,170 L320,160 L340,175 L360,160 L380,175 L400,165 L420,175 L440,160 L460,170 L480,160 L500,175 L520,165 L540,175 L560,165 L580,175 L600,160 L620,175 L640,165 L660,175 L680,160 L700,175 L720,165 L740,180 L760,165 L780,175 L800,160 L820,175 L840,165 L860,180 L880,170 L900,185 L920,170 L940,190 L955,210 L940,230 L955,250 L935,270 L915,260 L900,280 L880,270 L860,290 L840,275 L820,295 L800,280 L785,300 L765,285 L745,305 L725,290 L705,310 L685,295 L665,315 L645,300 L625,320 L600,305 L585,325 L565,310 L545,330 L525,315 L505,335 L485,320 L465,340 L445,325 L425,345 L405,330 L385,350 L365,335 L345,355 L325,340 L305,360 L285,345 L265,365 L245,350 L225,370 L205,355 L185,375 L165,360 L145,380 L125,365 L105,385 L85,370 L65,390 L45,365 L30,340 L45,320 L30,300 L45,280 L35,260 L50,240 L35,220 L50,200 Z" fill="#c8b382" stroke="#a68b52" stroke-width="2"/>
         </svg>
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
     <script>
-        // Türkiye'nin 81 İli - Fonksiyonel Sınıflandırma ve KPSS Detayları
+        // Türkiye'nin 81 İli - Hava Kirliliği Tipleri ve KPSS Detayları
         const allCities = [
             // Marmara
-            { name: "İstanbul", region: "Marmara", big: true, func: "Liman, Sanayi, Ticaret, Turizm", kpss: "Finans, idari ve küresel liman merkezi (Londra benzeri finans kenti)." },
-            { name: "Edirne", region: "Marmara", big: false, func: "Ulaşım / Sınır", kpss: "Kapıkule sınır kapısı ile Avrupa'ya açılan ana kara ulaşım kapısı." },
-            { name: "Kırklareli", region: "Marmara", big: false, func: "Ormancılık", kpss: "Istranca Dağları, meşe ormanları ve longoz ormanları ekosistemi." },
-            { name: "Tekirdağ", region: "Marmara", big: true, func: "Liman / Sanayi", kpss: "Trakya'nın dış ticarette aktif limanı ve yoğun sanayi bölgesi." },
-            { name: "Çanakkale", region: "Marmara", big: false, func: "Turizm / Ulaşım", kpss: "Boğazlar geçiş noktası, Truva ve turizm merkezi." },
-            { name: "Balıkesir", region: "Marmara", big: true, func: "Tarım / Turizm", kpss: "İki denize kıyısı; zeytin, zeytinyağı ve termal turizm." },
-            { name: "Bursa", region: "Marmara", big: true, func: "Sanayi / Turizm", kpss: "Otomotiv sanayi başkenti, tekstil ve Uludağ kış turizmi." },
-            { name: "Yalova", region: "Marmara", big: false, func: "Turizm / Tarım", kpss: "Termal kaplıcalar ve süs bitkiciliği / seracılık merkezi." },
-            { name: "Kocaeli", region: "Marmara", big: true, func: "Liman / Sanayi", kpss: "Türkiye'nin petrokimya ve ağır sanayi kalbi (İzmit Körfezi limanları)." },
-            { name: "Sakarya", region: "Marmara", big: true, func: "Sanayi / Tarım", kpss: "Adapazarı Ovası tarımı ve demiryolu/karayolu kavşak sanayisi." },
-            { name: "Bilecik", region: "Marmara", big: false, func: "Sanayi", kpss: "Seramik, vitrifiye ve mermer üretim üssü." },
+            { name: "İstanbul", region: "Marmara", big: true, air: "Los Angeles Tipi (Trafik/Egzoz yoğun)", kpss: "Yoğun trafik, egzoz gazları ve fotokimyasal smog." },
+            { name: "Edirne", region: "Marmara", big: false, air: "Londra Tipi (Isınma kaynaklı)", kpss: "Kışın konut ısıtmasında kullanılan kömür kaynaklı kirlilik." },
+            { name: "Kırklareli", region: "Marmara", big: false, air: "Temiz / Düşük Kirlilik", kpss: "Istranca dağları ve ormanlık alan etkisiyle temiz hava." },
+            { name: "Tekirdağ", region: "Marmara", big: true, air: "Los Angeles & Londra Karma", kpss: "Sanayi faaliyetleri ve artan motorlu taşıt trafiği." },
+            { name: "Çanakkale", region: "Marmara", big: false, air: "Temiz / Kıyı Esmeli", kpss: "Boğaz rüzgarları sayesinde hava sirkülasyonu elverişlidir." },
+            { name: "Balıkesir", region: "Marmara", big: true, air: "Londra Tipi (Isınma)", kpss: "Kış döneminde ısınmaya bağlı kükürt dioksit artışı." },
+            { name: "Bursa", region: "Marmara", big: true, air: "Los Angeles Tipi (Trafik ve Sanayi)", kpss: "Havza konumunda olması ve yoğun taşıt/sanayi dumanı." },
+            { name: "Yalova", region: "Marmara", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış aylarında ısınma kaynaklı hafif hava basması." },
+            { name: "Kocaeli", region: "Marmara", big: true, air: "Los Angeles Tipi (Sanayi & Trafik)", kpss: "Ağır sanayi, petrokimya ve yoğun otoyol trafiği." },
+            { name: "Sakarya", region: "Marmara", big: true, air: "Londra Tipi (Isınma)", kpss: "Çukur ova tabanında kışın kömür kullanımına bağlı kirlilik." },
+            { name: "Bilecik", region: "Marmara", big: false, air: "Londra Tipi (Isınma)", kpss: "Vadi tabanında yer almasından ötürü kışın hava sirkülasyonu zayıftır." },
 
             // Ege
-            { name: "İzmir", region: "Ege", big: true, func: "Liman / Ticaret / Turizm", kpss: "Ege'nin ihraç limanı, fuar ve ticaret kenti (Los Angeles benzeri kıyı metropolü)." },
-            { name: "Manisa", region: "Ege", big: true, func: "Tarım / Sanayi", kpss: "Gediz Ovası çekirdeksiz kuru üzüm, tütün ve beyaz eşya sanayi." },
-            { name: "Aydın", region: "Ege", big: true, func: "Tarım / Enerji", kpss: "İncir, zeytin üretim merkezi ve jeotermal enerji potansiyeli." },
-            { name: "Muğla", region: "Marmara/Ege", big: true, func: "Turizm", kpss: "En çok koy/körfeze sahip, yaz turizmi ve çam balı üretim merkezi." },
-            { name: "Denizli", region: "Ege", big: true, func: "Sanayi / Turizm", kpss: "Pamukkale travertenleri, havlu/bornoz tekstili ve mermercilik." },
-            { name: "Uşak", region: "Ege", big: false, func: "Sanayi", kpss: "Halıcılık, battaniye üretimi ve ilk şeker fabrikası tarihi." },
-            { name: "Kütahya", region: "Ege", big: false, func: "Sanayi / Maden", kpss: "Porselen, çini el sanatları ve linyit yataklı termik santraller." },
-            { name: "Afyonkarahisar", region: "Ege", big: false, func: "Ulaşım / Tarım", kpss: "Demiryolu ve karayollarının kesiştiği kavşak, haşhaş ve termal turizm." },
+            { name: "İzmir", region: "Ege", big: true, air: "Los Angeles Tipi (Trafik / Egzoz)", kpss: "Metropol hayatı, yoğun taşıt trafiği ve fotokimyasal duman." },
+            { name: "Manisa", region: "Marmara/Ege", big: true, air: "Londra Tipi (Isınma)", kpss: "Gediz çöküntü ovasında kış inversiyonu ve kömür kullanımı." },
+            { name: "Aydın", region: "Ege", big: true, air: "Londra Tipi (Isınma)", kpss: "Büyük Menderes grabeninde kışın ısınma kaynaklı duman." },
+            { name: "Muğla", region: "Ege", big: true, air: "Temiz / Kıyı Esmeli", kpss: "Ege kıyılarında deniz etkisiyle hava kalitesi yüksektir." },
+            { name: "Denizli", region: "Ege", big: true, air: "Londra Tipi (Çukur Havza)", kpss: "Çevresi dağlarla çevrili havza yapısı nedeniyle kışın duman birikir." },
+            { name: "Uşak", region: "Ege", big: false, air: "Londra Tipi (Isınma)", kpss: "Karasal iklim ve kışın kömür tüketimi." },
+            { name: "Kütahya", region: "Ege", big: false, air: "Londra Tipi (Termik & Isınma)", kpss: "Linyit yakan termik santraller ve evsel ısınma birleşimi." },
+            { name: "Afyonkarahisar", region: "Ege", big: false, air: "Londra Tipi (Isınma)", kpss: "Sert karasal kış koşulları ve kömür kullanımı." },
 
             // İç Anadolu
-            { name: "Ankara", region: "İç Anadolu", big: true, func: "Ulaşım / İdari", kpss: "Ülkenin idari başkenti ve demiryolu/karayolu ana kavşak merkezi." },
-            { name: "Eskişehir", region: "İç Anadolu", big: true, func: "Sanayi / Ulaşım", kpss: "Lületaşı, havacılık sanayi, yüksek hızlı tren (YHT) merkezi." },
-            { name: "Konya", region: "İç Anadolu", big: true, func: "Tarım", kpss: "Türkiye'nin tahıl ambarı, yüzölçümü en büyük il, boksit madeni." },
-            { name: "Karaman", region: "İç Anadolu", big: false, func: "Tarım / Sanayi", kpss: "Bisküvi ve unlu mamuller gıda sanayi, elma üretimi." },
-            { name: "Aksaray", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Tuz Gölü havzası çevresinde tahıl ve hayvancılık faaliyetleri." },
-            { name: "Niğde", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Patates ve lahana üretiminde Türkiye'nin önde gelen merkezi." },
-            { name: "Nevşehir", region: "İç Anadolu", big: false, func: "Turizm / Tarım", kpss: "Kapadokya peri bacaları, yer altı şehirleri ve patates depoculuğu." },
-            { name: "Kırşehir", region: "İç Anadolu", big: false, func: "Kültür / Maden", kpss: "Linyit yatakları ve Ahilik kültürü merkezi." },
-            { name: "Kırıkkale", region: "İç Anadolu", big: false, func: "Sanayi / Ulaşım", kpss: "MKE savunma sanayi fabrikaları ve Doğu'ya açılan kavşak." },
-            { name: "Çankırı", region: "İç Anadolu", big: false, func: "Maden", kpss: "Kaya tuzu rezervleri ve yeraltı tuz mağaraları." },
-            { name: "Yozgat", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Kuru tarım, mercimek üretimi ve linyit ocakları." },
-            { name: "Sivas", region: "İç Anadolu", big: false, func: "Maden / Ulaşım", kpss: "Divriği demir madeni yatakları, geniş yüzölçümü ve demiryolu ağı." },
-            { name: "Kayseri", region: "İç Anadolu", big: true, func: "Sanayi / Ticaret", kpss: "Erciyes eteklerinde mobilya, halı imalatı ve iç ticaret merkezi." },
+            { name: "Ankara", region: "İç Anadolu", big: true, air: "Los Angeles Tipi (Yoğun Trafik) & Londra", kpss: "Hem devasa araç filosu (LA) hem çanak yapıda kömür dumanı (Londra)." },
+            { name: "Eskişehir", region: "İç Anadolu", big: true, air: "Londra Tipi (Isınma)", kpss: "Düz ova tabanı ve kışın yoğun ısınma dumanı." },
+            { name: "Konya", region: "İç Anadolu", big: true, air: "Londra Tipi (Isınma)", kpss: "Geniş düzlükte kış aylarında basinç etkisiyle hava basması." },
+            { name: "Karaman", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Karasal iklim ve kömür tüketimi." },
+            { name: "Aksaray", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış mevsiminde evsel ısınma etkili." },
+            { name: "Niğde", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Dağ eteklerinde çanak alan kış inversiyonu." },
+            { name: "Nevşehir", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış aylarında turizm ve konut ısınma emisyonları." },
+            { name: "Kırşehir", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Karasal kış şartları." },
+            { name: "Kırıkkale", region: "İç Anadolu", big: false, air: "Londra Tipi (Sanayi & Isınma)", kpss: "Tüpraş ve sanayi tesisleri ile kış ısınması." },
+            { name: "Çankırı", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Dar vadi yapısı ve kömür kullanımı." },
+            { name: "Yozgat", region: "İç Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Sert kış koşulları." },
+            { name: "Sivas", region: "İç Anadolu", big: false, air: "Londra Tipi (Karakteristik Örnek)", kpss: "Türkiye'de kışın kömür dumanının en net gözlendiği çukur illerden." },
+            { name: "Kayseri", region: "İç Anadolu", big: true, air: "Londra Tipi (Erciyes Rüzgarsızlık)", kpss: "Erciyes eteklerinde rüzgar alamayan havzada kömür kirliliği." },
 
             // Akdeniz
-            { name: "Antalya", region: "Akdeniz", big: true, func: "Turizm / Tarım", kpss: "Uluslararası turizm başkenti, seracılık ve narenciye cenneti." },
-            { name: "Isparta", region: "Akdeniz", big: false, func: "Tarım / Turizm", kpss: "Dünya gül yağı üretimi merkezi ve elma bahçeleri." },
-            { name: "Burdur", region: "Akdeniz", big: false, func: "Turizm", kpss: "Göller yöresi, Mars yüzeyine benzeyen Salda Gölü." },
-            { name: "Mersin", region: "Akdeniz", big: true, func: "Liman / Ticaret", kpss: "Doğu Akdeniz'in uluslararası ticaret limanı ve narenciye üssü." },
-            { name: "Adana", region: "Akdeniz", big: true, func: "Tarım / Sanayi", kpss: "Çukurova Ovası pamuk/mısır üretimi ve tekstil sanayi." },
-            { name: "Osmaniye", region: "Akdeniz", big: false, func: "Tarım", kpss: "Türkiye yer fıstığı üretiminin başkenti." },
-            { name: "Kahramanmaraş", region: "Akdeniz", big: true, func: "Sanayi", kpss: "Tekstil, pamuk işleme, dondurma ve enerji tesisleri." },
-            { name: "Hatay", region: "Akdeniz", big: true, func: "Liman / Tarım", kpss: "İskenderun limanı, demir-çelik sanayi ve zeytincilik." },
+            { name: "Antalya", region: "Akdeniz", big: true, air: "Los Angeles Tipi (Yaz Turizm Trafiği)", kpss: "Yaz aylarında artan araç trafiği ve egzoz emisyonları." },
+            { name: "Isparta", region: "Akdeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Çukur ova yapısı ve kış ısınması." },
+            { name: "Burdur", region: "Akdeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Göl çevresi çanak alan kış şartları." },
+            { name: "Mersin", region: "Akdeniz", big: true, air: "Los Angeles Tipi (Liman/Trafik)", kpss: "Liman faaliyetleri, ağır tonajlı araç trafiği ve egzoz." },
+            { name: "Adana", region: "Akdeniz", big: true, air: "Los Angeles Tipi (Trafik & Sanayi)", kpss: "Geniş ova üzerinde artan motorlu taşıt ve sanayi dumanı." },
+            { name: "Osmaniye", region: "Akdeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış mevsiminde kömür kullanımı." },
+            { name: "Kahramanmaraş", region: "Akdeniz", big: true, air: "Londra Tipi (Çukur Vadi)", kpss: "Dağlar arasında kalan havza yapısı ve sanayi/kömür karması." },
+            { name: "Hatay", region: "Akdeniz", big: true, air: "Los Angeles Tipi (Sanayi & Trafik)", kpss: "Demir-çelik tesisleri ve yoğun sınır/şehir içi taşıt trafiği." },
 
             // Karadeniz
-            { name: "Bolu", region: "Karadeniz", big: false, func: "Ulaşım / Turizm", kpss: "Anadolu geçit noktası (Bolu Dağı), ormancılık ve Abant gölü." },
-            { name: "Düzce", region: "Karadeniz", big: false, func: "Tarım / Sanayi", kpss: "Fındık, orman ürünleri ve mobilya sanayi." },
-            { name: "Zonguldak", region: "Karadeniz", big: false, func: "Maden / Sanayi", kpss: "Taşkömürü havzası ve Ereğli Demir-Çelik fabrikası." },
-            { name: "Bartın", region: "Karadeniz", big: false, func: "Liman / Orman", kpss: "Amasra tarihi limanı ve ormancılık ürünleri." },
-            { name: "Karabük", region: "Karadeniz", big: false, func: "Sanayi", kpss: "KARDEMİR ile Türkiye'nin ilk demir-çelik fabrikası kenti." },
-            { name: "Kastamonu", region: "Karadeniz", big: false, func: "Maden / Tarım", kpss: "Küre bakır yatakları, İnebolu limanı ve sarımsak." },
-            { name: "Sinop", region: "Karadeniz", big: false, func: "Liman", kpss: "Türkiye'nin en kuzey ucu ve tek doğal limanı." },
-            { name: "Samsun", region: "Karadeniz", big: true, func: "Liman / Ulaşım", kpss: "Orta Karadeniz'in en büyük limanı ve demiryolu bağlantısı." },
-            { name: "Amasya", region: "Karadeniz", big: false, func: "Tarım / Turizm", kpss: "Yeşilırmak vadisi, elma tarımı ve tarihi evler." },
-            { name: "Tokat", region: "Karadeniz", big: false, func: "Tarım", kpss: "Kazova tarım potansiyeli, tütün ve bağcılık." },
-            { name: "Çorum", region: "Karadeniz", big: false, func: "Tarım / Sanayi", kpss: "Unlu mamuller, leblebi ve Hitit başkenti Hattuşaş." },
-            { name: "Ordu", region: "Karadeniz", big: true, func: "Tarım", kpss: "Fındık üretiminde lider illerden biri." },
-            { name: "Giresun", region: "Karadeniz", big: false, func: "Tarım", kpss: "Fındığın ana vatanı ve doğuya geçiş kıyısı." },
-            { name: "Trabzon", region: "Karadeniz", big: true, func: "Liman / Ticaret", kpss: "Doğu Karadeniz'in uluslararası ticaret ve liman merkezi." },
-            { name: "Rize", region: "Karadeniz", big: false, func: "Tarım", kpss: "Çay tarımı, işleme fabrikaları ve Anzer balı." },
-            { name: "Artvin", region: "Karadeniz", big: false, func: "Enerji / Baraj", kpss: "Çoruh nehri üzerindeki dev barajlar (Deriner, Yusufeli) ve HES'ler." },
-            { name: "Gümüşhane", region: "Karadeniz", big: false, func: "Maden", kpss: "Gümüş, kurşun ve çinko maden yatakları." },
-            { name: "Bayburt", region: "Karadeniz", big: false, func: "Tarım", kpss: "Düşük nüfus yoğunluğu, arıcılık ve tarım." },
+            { name: "Bolu", region: "Karadeniz", big: false, air: "Londra Tipi (Bolu Dağı Çukuru)", kpss: "Bolu çanağında kışın inversiyon nedeniyle yoğun sis ve kömür dumanı." },
+            { name: "Düzce", region: "Karadeniz", big: false, air: "Londra Tipi (Çukur Ova)", kpss: "Etrafı dağlarla çevrili ovada kışın hava değişimi kısıtlıdır." },
+            { name: "Zonguldak", region: "Karadeniz", big: false, air: "Londra Tipi (Taşkömürü & Sanayi)", kpss: "Kömür havzası olması nedeniyle klasik Londra tipi kirliliğin anavatanıdır." },
+            { name: "Bartın", region: "Karadeniz", big: false, air: "Temiz / Kıyı", kpss: "Karadeniz kıyı rüzgarları temiz hava sağlar." },
+            { name: "Karabük", region: "Karadeniz", big: false, air: "Londra Tipi (Demir-Çelik & Vadi)", kpss: "Deep vadi tabanındaki demir-çelik fabrikası ve ısınma dumanı." },
+            { name: "Kastamonu", region: "Karadeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "İç kesim vadilerinde kışın kömür dumanı birikmesi." },
+            { name: "Sinop", region: "Karadeniz", big: false, air: "Temiz Hava (Türkiye'nin En Temizi)", kpss: "Sanayi ve yoğun trafik olmaması ile en temiz havaya sahip yerlerden." },
+            { name: "Samsun", region: "Karadeniz", big: true, air: "Los Angeles & Londra Karma", kpss: "Delta ovası olmasına rağmen artan şehir içi trafik ve ısınma." },
+            { name: "Amasya", region: "Karadeniz", big: false, air: "Londra Tipi (Dar Vadi)", kpss: "Yeşilırmak dar vadisinde sıkışan kış dumanı." },
+            { name: "Tokat", region: "Karadeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Karasal geçit iklimi ve kömür tüketimi." },
+            { name: "Çorum", region: "Karadeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış mevsiminde evsel ısınma emisyonları." },
+            { name: "Ordu", region: "Karadeniz", big: true, air: "Temiz / Kıyı", kpss: "Deniz kıyısı konumu ile hava sirkülasyonu iyidir." },
+            { name: "Giresun", region: "Karadeniz", big: false, air: "Temiz / Kıyı", kpss: "Kıyı esintileri kirliliği önler." },
+            { name: "Trabzon", region: "Karadeniz", big: true, air: "Los Angeles Tipi (Trafik Yoğunluğu)", kpss: "Dar sahil şeridinde sıkışan taşıt trafiği ve egzoz gazları." },
+            { name: "Rize", region: "Karadeniz", big: false, air: "Temiz Hava (Yağış Yıkaması)", kpss: "Yıl boyu yüksek yağış alması havayı partiküllerden arındırır." },
+            { name: "Artvin", region: "Karadeniz", big: false, air: "Temiz / Dağlık", kpss: "Derin vadiler ve bol orman örtüsü." },
+            { name: "Gümüşhane", region: "Karadeniz", big: false, air: "Londra Tipi (Vadi Tabanı)", kpss: "Dar vadi içinde kalan yerleşimde kış dumanı." },
+            { name: "Bayburt", region: "Karadeniz", big: false, air: "Londra Tipi (Isınma)", kpss: "Sert kış şartları ve kömür kullanımı." },
 
             // Doğu Anadolu
-            { name: "Erzurum", region: "Doğu Anadolu", big: true, func: "Ulaşım / Turizm", kpss: "Doğu'nun ana kavşağı, Palandöken kış turizmi ve büyükbaş meraları." },
-            { name: "Erzincan", region: "Doğu Anadolu", big: false, func: "Tarım / Maden", kpss: "Karasu vadisi, tulum peyniri ve aktif deprem kuşağı." },
-            { name: "Kars", region: "Doğu Anadolu", big: false, func: "Tarım / Turizm", kpss: "Sert karasal iklim, Ani Harabeleri ve büyükbaş mera hayvancılığı." },
-            { name: "Ardahan", region: "Doğu Anadolu", big: false, func: "Ulaşım / Tarım", kpss: "Türkgözü sınır kapısı, en soğuk illerden biri ve mera hayvancılığı." },
-            { name: "Iğdır", region: "Doğu Anadolu", big: false, func: "Tarım", kpss: "Mikroklima alanı sayesinde pamuk ve meyve (kayısı) yetişen çukur alan." },
-            { name: "Ağrı", region: "Doğu Anadolu", big: false, func: "Turizm / Tarım", kpss: "Türkiye'nin en yüksek dağı (Ağrı Dağı) ve İshak Paşa Sarayı." },
-            { name: "Van", region: "Doğu Anadolu", big: true, func: "Turizm / Ulaşım", kpss: "Van Gölü, inci kefali balığı ve Doğu Anadolu'nun turizm merkezi." },
-            { name: "Muş", region: "Doğu Anadolu", big: false, func: "Tarım", kpss: "Muş Ovası tarım potansiyeli ve lale üretimi." },
-            { name: "Bitlis", region: "Doğu Anadolu", big: false, func: "Turizm / Tarım", kpss: "Nemrut krater gölü, tütün ve ceviz üretimi." },
-            { name: "Hakkari", region: "Doğu Anadolu", big: false, func: "Maden", kpss: "En engebeli ve dağlık il, çinko/kurşun madenleri." },
-            { name: "Bingöl", region: "Doğu Anadolu", big: false, func: "Enerji / Arıcılık", kpss: "Termal kaynaklar, dağlık yapı ve bal üretimi." },
-            { name: "Tunceli", region: "Doğu Anadolu", big: false, func: "Turizm", kpss: "Munzur vadisi millî parkı ve en düşük nüfus yoğunluğu." },
-            { name: "Elazığ", region: "Doğu Anadolu", big: false, func: "Enerji / Maden", kpss: "Keban Barajı (HES), mermer rezervleri ve bağcılık." },
-            { name: "Malatya", region: "Doğu Anadolu", big: true, func: "Tarım / Ulaşım", kpss: "Dünya kayısı başkenti ve demiryolu/karayolu kavşak noktası." },
+            { name: "Erzurum", region: "Doğu Anadolu", big: true, air: "Londra Tipi (Sert Kış & Kömür)", kpss: "Türkiye'nin en sert kışlarından biri; kömür kullanımına bağlı yoğun kirlilik." },
+            { name: "Erzincan", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Çukur Vadi)", kpss: "Karasu vadisi tabanında kışın hava akımı düşüktür." },
+            { name: "Kars", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Uzun süren kış sezonu ve ısınma emisyonları." },
+            { name: "Ardahan", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Şiddetli soğuklar ve evsel kömür tüketimi." },
+            { name: "Iğdır", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Çukur Havza Basması)", kpss: "Etrafı yüksek dağlarla çevrili çukur havza yapısı nedeniyle kışın duman dağılmaz." },
+            { name: "Ağrı", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Sert karasal iklim koşulları." },
+            { name: "Van", region: "Doğu Anadolu", big: true, air: "Londra Tipi (Isınma)", kpss: "Göl kenarı çanak yapı ve kış ısınması." },
+            { name: "Muş", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Muş ovası kış inversiyonu." },
+            { name: "Bitlis", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Dağ yamacında ve çukurda kalan yerleşim." },
+            { name: "Hakkari", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Dar Vadi)", kpss: "Çok dik dağlar arasındaki dar vadilerde duman sıkışması." },
+            { name: "Bingöl", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış şartları." },
+            { name: "Tunceli", region: "Doğu Anadolu", big: false, air: "Temiz / Dağlık", kpss: "Sanayi ve yoğun nüfus olmaması nedeniyle temiz." },
+            { name: "Elazığ", region: "Doğu Anadolu", big: false, air: "Londra Tipi (Isınma)", kpss: "Baraj gölü etkisi ve kış ısınması." },
+            { name: "Malatya", region: "Doğu Anadolu", big: true, air: "Los Angeles & Londra Karma", kpss: "Artan şehirleşme, taşıt trafiği ve kışın ısınma dumanı." },
 
             // Güneydoğu Anadolu
-            { name: "Gaziantep", region: "Güneydoğu", big: true, func: "Sanayi / Ticaret", kpss: "Güneydoğu'nun sanayi, halı dokuma, ticaret ve gastronomi kenti." },
-            { name: "Kilis", region: "Güneydoğu", big: false, func: "Tarım / Sınır", kpss: "Zeytin, zeytinyağı ve üzüm tarımı ile sınır kapısı kenti." },
-            { name: "Adıyaman", region: "Doğu/GD", big: false, func: "Turizm / Enerji", kpss: "Nemrut Dağı tescilli heykelleri, tütün tarımı ve petrol üretimi." },
-            { name: "Şanlıurfa", region: "Güneydoğu", big: true, func: "Tarım / Enerji", kpss: "GAP projesi ile sulanan tarım alanları, pamuk ve Göbeklitepe." },
-            { name: "Diyarbakır", region: "Güneydoğu", big: true, func: "Ulaşım / Ticaret", kpss: "Bölgenin merkez şehri, surları, Hevsel bahçeleri ve karpuzu." },
-            { name: "Mardin", region: "Güneydoğu", big: true, func: "Turizm", kpss: "Taş mimari evleri, tarihi dokusu ve Mezopotamya ovası manzarası." },
-            { name: "Batman", region: "Güneydoğu", big: false, func: "Enerji / Maden", kpss: "Raman Dağı petrol çıkarma sahası ve petrol rafinerisi." },
-            { name: "Siirt", region: "Güneydoğu", big: false, func: "Tarım", kpss: "Siirt fıstığı (bıttım) üretimi." },
-            { name: "Şırnak", region: "Güneydoğu", big: false, func: "Ulaşım / Maden", kpss: "Habur sınır kapısı (Irak ticaret hattı), asfaltit ve kömür yatakları." }
+            { name: "Gaziantep", region: "Güneydoğu", big: true, air: "Los Angeles Tipi (Sanayi & Trafik)", kpss: "Büyük sanayi tesisleri ve yoğun karayolu transit geçiş trafiği." },
+            { name: "Kilis", region: "Güneydoğu", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış mevsimi ısınma emisyonları." },
+            { name: "Adıyaman", region: "Doğu/GD", big: false, air: "Londra Tipi (Isınma)", kpss: "Karasal iklim kış dönemi." },
+            { name: "Şanlıurfa", region: "Güneydoğu", big: true, air: "Los Angeles Tipi (Trafik Yoğunluğu)", kpss: "Geniş ova düzlüğünde artan motorlu taşıt sayısı." },
+            { name: "Diyarbakır", region: "Güneydoğu", big: true, air: "Los Angeles Tipi (Trafik) & Londra", kpss: "Bölgesel merkez olmasından ötürü artan trafik ve ısınma dumanı." },
+            { name: "Mardin", region: "Güneydoğu", big: true, air: "Temiz / Yamaç Konumu", kpss: "Yüksek tepe yamacında kurulu olması sayesinde rüzgar alır." },
+            { name: "Batman", region: "Güneydoğu", big: false, air: "Los Angeles Tipi (Rafineri & Sanayi)", kpss: "Petrol rafinerisi ve akaryakıt sanayi kaynaklı emisyonlar." },
+            { name: "Siirt", region: "Güneydoğu", big: false, air: "Londra Tipi (Isınma)", kpss: "Kış dönemi evsel ısınma." },
+            { name: "Şırnak", region: "Güneydoğu", big: false, air: "Londra Tipi (Asfaltit/Kömür)", kpss: "Bölgesel kömür/asfaltit kullanımı ve vadi yapısı." }
         ];
 
         let currentMode = 'learn';
@@ -354,7 +354,7 @@
                 if (currentMode === 'learn') {
                     marker.addEventListener('mouseenter', () => {
                         const bigText = city.big ? ' <span style="color:var(--sage-green); font-size:11px;">(Büyükşehir)</span>' : '';
-                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong>${bigText} <span style="font-size:11px; color:#666;">[${city.region}]</span><br><span style="font-size:11px; color:var(--sage-green); font-weight:600;">⚡ Fonksiyon: ${city.func}</span><br><span style="font-size:12px; color:#333;">💡 KPSS: ${city.kpss}</span>`;
+                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong>${bigText} <span style="font-size:11px; color:#666;">[${city.region}]</span><br><span style="font-size:11px; color:var(--champagne-gold); font-weight:600;">☁️ Kirlilik Tipi: ${city.air}</span><br><span style="font-size:12px; color:#333;">💡 KPSS: ${city.kpss}</span>`;
                         tooltip.style.left = (city.x + 1.5) + '%';
                         tooltip.style.top = (city.y - 4) + '%';
                         tooltip.style.opacity = '1';
@@ -383,7 +383,7 @@
             tooltip.style.opacity = '0';
 
             if (mode === 'learn') {
-                statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek fonksiyonel özellikleri ve KPSS detaylarını görebilirsin.";
+                statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek hava kirliliği tipini ve KPSS detaylarını görebilirsin.";
                 statusBar.style.color = "var(--text-dark)";
             } else if (mode === 'test') {
                 startTest();
@@ -395,7 +395,7 @@
             const randomIndex = Math.floor(Math.random() * allCities.length);
             currentTestCity = allCities[randomIndex];
             
-            statusBar.innerHTML = `Hedef İl: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 Fonksiyon: ${currentTestCity.func} | İpucu: ${currentTestCity.kpss}</span>`;
+            statusBar.innerHTML = `Hedef İl: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 Kirlilik: ${currentTestCity.air} | İpucu: ${currentTestCity.kpss}</span>`;
             statusBar.style.color = "var(--text-dark)";
         }
 
