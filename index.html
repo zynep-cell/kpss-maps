@@ -79,6 +79,30 @@
             background-color: var(--bg-cream);
         }
 
+        /* Düzenleme moduna özel silme butonları */
+        .setup-actions {
+            display: none;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button.action-btn {
+            background-color: var(--white);
+            border: 1px solid var(--pastel-pink);
+            color: var(--text-dark);
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--pastel-pink);
+            color: var(--white);
+        }
+
         /* Akıllı Kurulum Paneli */
         .setup-panel {
             display: none;
@@ -188,13 +212,13 @@
         /* Test modu için ekstra ince vurgu */
         .mountain-marker.test-btn {
             background-color: transparent;
-            border: 1px solid transparent; /* Sınırı incelttik */
+            border: 1px solid transparent;
         }
         
         .mountain-marker.test-btn:hover {
             border: 1px solid var(--light-blue);
             background-color: rgba(184, 216, 224, 0.4);
-            transform: translate(-50%, -50%) scale(1.1); /* Büyümeyi azalttık */
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
         .tooltip {
@@ -222,6 +246,12 @@
         <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
         <button id="btn-test" class="main-btn" onclick="setMode('test')">Test Modu</button>
         <button id="btn-setup" class="main-btn setup-mode" onclick="setMode('setup')">Yer Belirleme (Düzenle)</button>
+    </div>
+
+    <!-- Silme işlemleri için panel -->
+    <div class="setup-actions" id="setup-actions">
+        <button class="action-btn" onclick="clearSelected()">Seçili Olanı Sil</button>
+        <button class="action-btn" onclick="resetAll()">Tümünü Sıfırla</button>
     </div>
 
     <!-- Akıllı Kurulum Paneli -->
@@ -298,6 +328,7 @@
         const statusBar = document.getElementById('status-bar');
         const mapContainer = document.getElementById('map-container');
         const setupPanel = document.getElementById('setup-panel');
+        const setupActions = document.getElementById('setup-actions');
 
         function initMap() {
             markersLayer.innerHTML = '';
@@ -311,7 +342,7 @@
                 marker.style.top = savedCoords[mountain.id].y + '%';
                 
                 if (currentMode === 'learn') {
-                    marker.style.width = '14px'; /* Öğrenme modu için de biraz küçülttük */
+                    marker.style.width = '14px';
                     marker.style.height = '14px';
                     marker.style.opacity = '1';
                     marker.style.backgroundColor = "rgba(200, 179, 130, 0.7)";
@@ -328,7 +359,6 @@
                         tooltip.style.opacity = '0';
                     });
                 } else if (currentMode === 'test') {
-                    // Butonları yuvarlaklara tam oturacak şekilde küçülttük
                     marker.style.width = '14px'; 
                     marker.style.height = '14px';
                     marker.style.opacity = '1'; 
@@ -398,6 +428,7 @@
             tooltip.style.opacity = '0';
 
             setupPanel.style.display = (mode === 'setup') ? 'flex' : 'none';
+            setupActions.style.display = (mode === 'setup') ? 'flex' : 'none';
 
             if (mode === 'learn') {
                 mapContainer.classList.remove('setup-active');
@@ -419,7 +450,7 @@
                 mapContainer.classList.add('setup-active');
                 mapImage.src = 'daglar_dolu.png.jpeg';
                 
-                if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked();
+                if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked() || mountains[0].id;
                 
                 renderSetupPanel();
                 updateSetupStatus();
@@ -448,6 +479,29 @@
             updateSetupStatus();
             initMap(); 
         }
+
+        // --- YENİ EKLENEN SİLME FONKSİYONLARI ---
+        function clearSelected() {
+            if (activeSetupMountainId && savedCoords[activeSetupMountainId]) {
+                delete savedCoords[activeSetupMountainId];
+                localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
+                renderSetupPanel();
+                updateSetupStatus();
+                initMap();
+            }
+        }
+
+        function resetAll() {
+            if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
+                savedCoords = {};
+                localStorage.removeItem('daglarCoordsCoreZenV2');
+                activeSetupMountainId = mountains[0].id;
+                renderSetupPanel();
+                updateSetupStatus();
+                initMap();
+            }
+        }
+        // ----------------------------------------
 
         function startTest() {
             const markedMountains = mountains.filter(m => savedCoords[m.id]);
