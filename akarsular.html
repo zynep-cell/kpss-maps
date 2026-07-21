@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Zen - Akarsular Hafıza Merkezi</title>
+    <style>
+        :root {
+            --bg-cream: #fcfbf9;
+            --sage-green: #9fb5a3;
+            --butter-yellow: #fceea7;
+            --light-blue: #b8d8e0;
+            --pastel-pink: #f4d1d9;
+            --champagne-gold: #c8b382;
+            --text-dark: #333333;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--champagne-gold);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button.main-btn {
+            background-color: var(--white);
+            border: 1px solid var(--champagne-gold);
+            color: var(--text-dark);
+            padding: 10px 25px;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        button.main-btn.active {
+            background-color: var(--champagne-gold);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(200, 179, 130, 0.3);
+        }
+
+        button.main-btn.setup-mode {
+            border-color: var(--light-blue);
+        }
+        
+        button.main-btn.setup-mode.active {
+            background-color: var(--light-blue);
+            color: var(--text-dark);
+        }
+
+        button.main-btn:hover:not(.active) {
+            background-color: var(--bg-cream);
+        }
+
+        .setup-actions {
+            display: none;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button.action-btn {
+            background-color: var(--white);
+            border: 1px solid var(--pastel-pink);
+            color: var(--text-dark);
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--pastel-pink);
+            color: var(--white);
+        }
+
+        .setup-panel {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 1000px;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            justify-content: center;
+        }
+
+        .setup-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #dcdcdc;
+            background-color: var(--white);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+        }
+
+        .setup-pill:hover {
+            border-color: var(--champagne-gold);
+        }
+
+        .setup-pill.marked {
+            background-color: var(--sage-green);
+            color: var(--white);
+            border-color: var(--sage-green);
+        }
+
+        .setup-pill.active-target {
+            background-color: var(--butter-yellow);
+            color: var(--text-dark);
+            border-color: var(--champagne-gold);
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(200, 179, 130, 0.4);
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            min-height: 40px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: color 0.3s ease;
+            background-color: var(--white);
+            padding: 10px 30px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .map-container {
+            position: relative;
+            max-width: 1100px;
+            width: 100%;
+            border-radius: 4px;
+            background-color: var(--white);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            cursor: default;
+            line-height: 0;
+            font-size: 0;
+            display: block;
+        }
+
+        .map-container.setup-active {
+            cursor: crosshair;
+        }
+
+        #map-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+
+        #markers-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .river-marker {
+            position: absolute;
+            background-color: rgba(200, 179, 130, 0.5);
+            border: 1px solid var(--champagne-gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .river-marker:hover {
+            background-color: var(--butter-yellow);
+            transform: translate(-50%, -50%) scale(1.3);
+            z-index: 10;
+        }
+
+        .river-marker.test-btn {
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
+        
+        .river-marker.test-btn:hover {
+            border: 1px solid var(--light-blue);
+            background-color: rgba(184, 216, 224, 0.4);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--white);
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 3px solid var(--sage-green);
+            z-index: 20;
+            white-space: nowrap;
+            line-height: 1.4;
+        }
+
+        .hint-section {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .hint-toggle-btn {
+            background-color: var(--white);
+            border: 1px dashed var(--sage-green);
+            color: var(--sage-green);
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .hint-toggle-btn:hover {
+            background-color: var(--sage-green);
+            color: var(--white);
+        }
+
+        .hint-image-container {
+            display: none;
+            margin-top: 15px;
+            width: 100%;
+            border: 2px dashed var(--champagne-gold);
+            border-radius: 8px;
+            padding: 10px;
+            background-color: var(--white);
+        }
+
+        .hint-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TÜRKİYE'NİN AKARSULARI</h1>
+
+    <div class="controls">
+        <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
+        <button id="btn-test" class="main-btn" onclick="setMode('test')">Test Modu</button>
+        <button id="btn-setup" class="main-btn setup-mode" onclick="setMode('setup')">Yer Belirleme (Düzenle)</button>
+    </div>
+
+    <div class="setup-actions" id="setup-actions">
+        <button class="action-btn" onclick="clearSelected()">Seçili Olanı Sil</button>
+        <button class="action-btn" onclick="resetAll()">Tümünü Sıfırla</button>
+    </div>
+
+    <div class="setup-panel" id="setup-panel"></div>
+
+    <div class="status-bar" id="status-bar">
+        Harita üzerinde gezinerek akarsuları öğrenebilirsin.
+    </div>
+
+    <div class="map-container" id="map-container" onclick="handleMapClick(event)">
+        <img id="map-image" src="akarsu_bos.png.jpeg" alt="Türkiye Akarsular Haritası">
+        <div id="markers-layer"></div>
+        <div id="tooltip" class="tooltip"></div>
+    </div>
+
+    <div class="hint-section">
+        <button class="hint-toggle-btn" onclick="toggleHint()">Dolu Haritayı (Kopya) Aç / Kapat</button>
+        <div class="hint-image-container" id="hint-container">
+            <img src="akarsu_dolu.png.jpeg" alt="Türkiye Akarsular Dolu Haritası">
+        </div>
+    </div>
+
+    <script>
+        const rivers = [
+            { id: 'ak_1', name: "Meriç", num: 1 },
+            { id: 'ak_2', name: "Susurluk", num: 2 },
+            { id: 'ak_3', name: "Bakırçay", num: 3 },
+            { id: 'ak_4', name: "Gediz", num: 4 },
+            { id: 'ak_5', name: "Küçük Menderes", num: 5 },
+            { id: 'ak_6', name: "Büyük Menderes", num: 6 },
+            { id: 'ak_7', name: "Dalaman", num: 7 },
+            { id: 'ak_8', name: "Eşen", num: 8 },
+            { id: 'ak_9', name: "Aksu", num: 9 },
+            { id: 'ak_10', name: "Köprüçay", num: 10 },
+            { id: 'ak_11', name: "Manavgat", num: 11 },
+            { id: 'ak_12', name: "Göksu", num: 12 },
+            { id: 'ak_13', name: "Seyhan", num: 13 },
+            { id: 'ak_14', name: "Ceyhan", num: 14 },
+            { id: 'ak_15', name: "Asi", num: 15 },
+            { id: 'ak_16', name: "Fırat", num: 16 },
+            { id: 'ak_17', name: "Dicle", num: 17 },
+            { id: 'ak_18', name: "Aras", num: 18 },
+            { id: 'ak_19', name: "Kura", num: 19 },
+            { id: 'ak_20', name: "Çoruh", num: 20 },
+            { id: 'ak_21', name: "Yeşilırmak", num: 21 },
+            { id: 'ak_22', name: "Kızılırmak", num: 22 },
+            { id: 'ak_23', name: "Filyos", num: 23 },
+            { id: 'ak_24', name: "Sakarya", num: 24 }
+        ];
+
+        let savedCoords = JSON.parse(localStorage.getItem('akarsuCoordsCoreZen')) || {};
+        let currentMode = 'learn';
+        let currentTestRiver = null;
+        let activeSetupRiverId = null;
+
+        const markersLayer = document.getElementById('markers-layer');
+        const tooltip = document.getElementById('tooltip');
+        const statusBar = document.getElementById('status-bar');
+        const mapContainer = document.getElementById('map-container');
+        const setupPanel = document.getElementById('setup-panel');
+        const setupActions = document.getElementById('setup-actions');
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-container');
+            if (hintBox.style.display === 'none' || hintBox.style.display === '') {
+                hintBox.style.display = 'block';
+            } else {
+                hintBox.style.display = 'none';
+            }
+        }
+
+        function initMap() {
+            markersLayer.innerHTML = '';
+            
+            rivers.forEach(river => {
+                if (!savedCoords[river.id]) return;
+
+                const marker = document.createElement('div');
+                marker.className = 'river-marker';
+                marker.style.left = savedCoords[river.id].x + '%';
+                marker.style.top = savedCoords[river.id].y + '%';
+                
+                if (currentMode === 'learn') {
+                    marker.style.width = '14px';
+                    marker.style.height = '14px';
+                    marker.style.opacity = '1';
+                    marker.style.backgroundColor = "rgba(200, 179, 130, 0.7)";
+                    marker.classList.remove('test-btn');
+
+                    marker.addEventListener('mouseenter', () => {
+                        tooltip.innerHTML = `<span style="color:var(--champagne-gold)">Akarsu No: ${river.num}</span><br>${river.name}`;
+                        tooltip.style.left = (savedCoords[river.id].x + 1.5) + '%';
+                        tooltip.style.top = (savedCoords[river.id].y - 3) + '%';
+                        tooltip.style.opacity = '1';
+                    });
+
+                    marker.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                } else if (currentMode === 'test') {
+                    marker.style.width = '14px'; 
+                    marker.style.height = '14px';
+                    marker.style.opacity = '1'; 
+                    marker.classList.add('test-btn'); 
+                    marker.style.zIndex = '10'; 
+
+                    marker.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        checkAnswer(river.name, marker);
+                    });
+                } else if (currentMode === 'setup') {
+                    marker.style.width = '12px';
+                    marker.style.height = '12px';
+                    marker.style.opacity = '0.8';
+                    marker.style.backgroundColor = (activeSetupRiverId === river.id) ? "var(--butter-yellow)" : "var(--sage-green)";
+                    marker.style.border = (activeSetupRiverId === river.id) ? "2px solid var(--champagne-gold)" : "none";
+                    marker.classList.remove('test-btn');
+                }
+
+                markersLayer.appendChild(marker);
+            });
+        }
+
+        function renderSetupPanel() {
+            setupPanel.innerHTML = '';
+            
+            rivers.forEach(river => {
+                const pill = document.createElement('div');
+                pill.className = 'setup-pill';
+                pill.textContent = `${river.num} - ${river.name}`;
+                
+                if (savedCoords[river.id]) pill.classList.add('marked');
+                if (activeSetupRiverId === river.id) pill.classList.add('active-target');
+
+                pill.onclick = () => {
+                    activeSetupRiverId = river.id;
+                    updateSetupStatus();
+                    renderSetupPanel();
+                    initMap(); 
+                };
+
+                setupPanel.appendChild(pill);
+            });
+        }
+
+        function updateSetupStatus() {
+            if (activeSetupRiverId) {
+                const current = rivers.find(r => r.id === activeSetupRiverId);
+                statusBar.innerHTML = `Lütfen haritada tıkla: <strong style="color: var(--champagne-gold); font-size: 20px;">No: ${current.num} (${current.name})</strong>`;
+                statusBar.style.color = "var(--text-dark)";
+            } else {
+                statusBar.innerHTML = `Yukarıdaki listeden bir akarsu seç ve haritadaki yerini tıkla. Yeşil olanlar işaretlenmiş demektir.`;
+                statusBar.style.color = "var(--text-dark)";
+            }
+        }
+
+        function findNextUnmarked() {
+            return rivers.find(r => !savedCoords[r.id])?.id || null;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-learn').classList.remove('active');
+            document.getElementById('btn-test').classList.remove('active');
+            document.getElementById('btn-setup').classList.remove('active');
+            document.getElementById(`btn-${mode}`).classList.add('active');
+            tooltip.style.opacity = '0';
+
+            setupPanel.style.display = (mode === 'setup') ? 'flex' : 'none';
+            setupActions.style.display = (mode === 'setup') ? 'flex' : 'none';
+
+            if (mode === 'learn') {
+                mapContainer.classList.remove('setup-active');
+                statusBar.innerHTML = Object.keys(savedCoords).length === 0 
+                    ? "Önce <strong>Yer Belirleme</strong> moduna girerek akarsuların konumlarını işaretlemelisin." 
+                    : "Harita üzerinde gezinerek akarsuları öğrenebilirsin.";
+                statusBar.style.color = "var(--text-dark)";
+            } else if (mode === 'test') {
+                mapContainer.classList.remove('setup-active');
+                if (Object.keys(savedCoords).length === 0) {
+                    statusBar.innerHTML = "Lütfen önce Yer Belirleme modunda en az bir akarsu işaretle.";
+                    statusBar.style.color = "var(--pastel-pink)";
+                    return;
+                }
+                startTest();
+            } else if (mode === 'setup') {
+                mapContainer.classList.add('setup-active');
+                if (!activeSetupRiverId) activeSetupRiverId = findNextUnmarked() || rivers[0].id;
+                renderSetupPanel();
+                updateSetupStatus();
+            }
+            initMap();
+        }
+
+        function handleMapClick(event) {
+            if (currentMode !== 'setup' || !activeSetupRiverId) return;
+
+            const rect = mapContainer.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+            if (x < 0 || x > 100 || y < 0 || y > 100) return;
+
+            savedCoords[activeSetupRiverId] = { x: x, y: y };
+            localStorage.setItem('akarsuCoordsCoreZen', JSON.stringify(savedCoords));
+            
+            activeSetupRiverId = findNextUnmarked();
+            
+            renderSetupPanel();
+            updateSetupStatus();
+            initMap(); 
+        }
+
+        function clearSelected() {
+            if (activeSetupRiverId && savedCoords[activeSetupRiverId]) {
+                delete savedCoords[activeSetupRiverId];
+                localStorage.setItem('akarsuCoordsCoreZen', JSON.stringify(savedCoords));
+                renderSetupPanel();
+                updateSetupStatus();
+                initMap();
+            }
+        }
+
+        function resetAll() {
+            if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
+                savedCoords = {};
+                localStorage.removeItem('akarsuCoordsCoreZen');
+                activeSetupRiverId = rivers[0].id;
+                renderSetupPanel();
+                updateSetupStatus();
+                initMap();
+            }
+        }
+
+        function startTest() {
+            const markedRivers = rivers.filter(r => savedCoords[r.id]);
+            const randomIndex = Math.floor(Math.random() * markedRivers.length);
+            currentTestRiver = markedRivers[randomIndex].name;
+            
+            statusBar.innerHTML = `Hedef: <strong style="color: var(--champagne-gold); font-size: 22px; margin: 0 8px;">${currentTestRiver}</strong> nerede?`;
+            statusBar.style.color = "var(--text-dark)";
+        }
+
+        function checkAnswer(clickedRiver, marker) {
+            if (clickedRiver === currentTestRiver) {
+                statusBar.textContent = `Doğru! Orası ${currentTestRiver}.`;
+                statusBar.style.color = "var(--sage-green)";
+                marker.style.backgroundColor = "var(--sage-green)";
+                marker.style.borderColor = "var(--sage-green)";
+                
+                setTimeout(() => {
+                    marker.style.backgroundColor = "transparent";
+                    marker.style.borderColor = "transparent";
+                    startTest();
+                }, 1500);
+            } else {
+                statusBar.textContent = `Yanlış yer. Orası ${clickedRiver}. Tekrar dene!`;
+                statusBar.style.color = "var(--pastel-pink)";
+            }
+        }
+
+        setMode('learn');
+    </script>
+</body>
+</html>
