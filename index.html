@@ -170,20 +170,33 @@
             background-color: var(--white);
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             cursor: default;
-            /* Kayma sorununu çözen anahtar kodlar */
             line-height: 0;
             font-size: 0;
             display: block;
+            overflow: hidden;
         }
 
         .map-container.setup-active {
             cursor: crosshair;
         }
 
-        #map-image {
+        /* Ana iskelet her zaman bu görselin boyutu olacak */
+        #map-dolu {
             width: 100%;
             height: auto;
             display: block;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Boş harita dolu haritanın kılığına girip tam üstüne oturuyor */
+        #map-bos {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; 
+            display: none;
             pointer-events: none;
         }
 
@@ -193,7 +206,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Tıklamaların direkt map-container'a geçmesini sağlar */
+            pointer-events: none;
         }
 
         .mountain-marker {
@@ -201,10 +214,10 @@
             background-color: rgba(200, 179, 130, 0.5);
             border: 1px solid var(--champagne-gold);
             border-radius: 50%;
-            transform: translate(-50%, -50%); /* Tam merkeze oturtur */
+            transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.2s ease;
-            pointer-events: auto; /* İşaretçilerin tıklanabilir kalmasını sağlar */
+            pointer-events: auto;
         }
 
         .mountain-marker:hover {
@@ -264,14 +277,15 @@
     </div>
 
     <div class="map-container" id="map-container" onclick="handleMapClick(event)">
-        <img id="map-image" src="daglar_dolu.png.jpeg" alt="Türkiye Dağlar Haritası">
+        <!-- İki görseli de sisteme gömdük -->
+        <img id="map-dolu" src="daglar_dolu.png.jpeg" alt="Türkiye Dağlar Dolu Haritası">
+        <img id="map-bos" src="daglar_bos.png.jpeg" alt="Türkiye Dağlar Boş Haritası">
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
     <script>
         const mountains = [
-            // Kırık Dağlar (1-7)
             { id: 'kirik_1', name: "Kaz Dağları", group: "Kırık", num: 1 },
             { id: 'kirik_2', name: "Madra Dağı", group: "Kırık", num: 2 },
             { id: 'kirik_3', name: "Yunt Dağı", group: "Kırık", num: 3 },
@@ -279,8 +293,6 @@
             { id: 'kirik_5', name: "Aydın Dağları", group: "Kırık", num: 5 },
             { id: 'kirik_6', name: "Menteşe Dağları", group: "Kırık", num: 6 },
             { id: 'kirik_7', name: "Amanos (Nur) Dağları", group: "Kırık", num: 7 },
-            
-            // Volkanik Dağlar (1-11)
             { id: 'volk_1', name: "Karadağ", group: "Volkanik", num: 1 },
             { id: 'volk_2', name: "Karacadağ (İç Anadolu)", group: "Volkanik", num: 2 },
             { id: 'volk_3', name: "Hasan Dağı", group: "Volkanik", num: 3 },
@@ -292,8 +304,6 @@
             { id: 'volk_9', name: "Tendürek Dağı", group: "Volkanik", num: 9 },
             { id: 'volk_10', name: "Ağrı Dağı", group: "Volkanik", num: 10 },
             { id: 'volk_11', name: "Kula Volkanları", group: "Volkanik", num: 11 },
-
-            // Kıvrım Dağlar (1-21)
             { id: 'kivrim_1', name: "Yıldız Dağları", group: "Kıvrım", num: 1 },
             { id: 'kivrim_2', name: "Samanlı Dağları", group: "Kıvrım", num: 2 },
             { id: 'kivrim_3', name: "Bolu Dağları", group: "Kıvrım", num: 3 },
@@ -322,7 +332,8 @@
         let currentTestMountain = null;
         let activeSetupMountainId = null;
 
-        const mapImage = document.getElementById('map-image');
+        const mapDolu = document.getElementById('map-dolu');
+        const mapBos = document.getElementById('map-bos');
         const markersLayer = document.getElementById('markers-layer');
         const tooltip = document.getElementById('tooltip');
         const statusBar = document.getElementById('status-bar');
@@ -350,7 +361,6 @@
 
                     marker.addEventListener('mouseenter', () => {
                         tooltip.innerHTML = `<span style="color:var(--champagne-gold)">${mountain.group} ${mountain.num}</span><br>${mountain.name}`;
-                        // Tooltip'i hafif yukarı ve sağa kaydır
                         tooltip.style.left = (savedCoords[mountain.id].x + 1.5) + '%';
                         tooltip.style.top = (savedCoords[mountain.id].y - 3) + '%';
                         tooltip.style.opacity = '1';
@@ -433,7 +443,9 @@
 
             if (mode === 'learn') {
                 mapContainer.classList.remove('setup-active');
-                mapImage.src = 'daglar_dolu.png.jpeg';
+                mapDolu.style.opacity = '1';
+                mapBos.style.display = 'none';
+                
                 statusBar.innerHTML = Object.keys(savedCoords).length === 0 
                     ? "Önce <strong>Yer Belirleme</strong> moduna girerek dağların konumlarını işaretlemelisin." 
                     : "Harita üzerinde gezinerek dağları öğrenebilirsin.";
@@ -445,11 +457,16 @@
                     statusBar.style.color = "var(--pastel-pink)";
                     return;
                 }
-                mapImage.src = 'daglar_bos.png.jpeg';
+                
+                // Püf Noktası: Dolu haritayı şeffaf yapıyoruz (boyutu korumak için), boş haritayı görünür kılıyoruz
+                mapDolu.style.opacity = '0';
+                mapBos.style.display = 'block';
+                
                 startTest();
             } else if (mode === 'setup') {
                 mapContainer.classList.add('setup-active');
-                mapImage.src = 'daglar_dolu.png.jpeg';
+                mapDolu.style.opacity = '1';
+                mapBos.style.display = 'none';
                 
                 if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked() || mountains[0].id;
                 
@@ -462,14 +479,11 @@
         function handleMapClick(event) {
             if (currentMode !== 'setup' || !activeSetupMountainId) return;
 
-            // Kayma problemini kökten çözen sağlam hesaplama yöntemi
             const rect = mapContainer.getBoundingClientRect();
             
-            // Tıklanan noktanın yüzdelik dilimini tam doğrulukla hesapla
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-            // Tıklama resmin çok dışına taşarsa (örn sağ/sol boşluklar) yoksay
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
             savedCoords[activeSetupMountainId] = { x: x, y: y };
