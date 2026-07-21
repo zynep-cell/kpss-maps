@@ -43,18 +43,12 @@
         .controls {
             display: flex;
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
-        .setup-actions {
-            display: none; /* Sadece yer belirleme modunda açılacak */
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        button {
+        button.main-btn {
             background-color: var(--white);
             border: 1px solid var(--champagne-gold);
             color: var(--text-dark);
@@ -66,34 +60,68 @@
             letter-spacing: 1px;
         }
 
-        button.active {
+        button.main-btn.active {
             background-color: var(--champagne-gold);
             color: var(--white);
             box-shadow: 0 4px 10px rgba(200, 179, 130, 0.3);
         }
 
-        button.setup-mode {
+        button.main-btn.setup-mode {
             border-color: var(--light-blue);
         }
         
-        button.setup-mode.active {
+        button.main-btn.setup-mode.active {
             background-color: var(--light-blue);
             color: var(--text-dark);
         }
 
-        button.action-btn {
-            border-color: var(--pastel-pink);
-            font-size: 14px;
-            padding: 8px 20px;
-        }
-
-        button.action-btn:hover {
-            background-color: var(--pastel-pink);
-            color: var(--white);
-        }
-
-        button:hover:not(.active):not(.action-btn) {
+        button.main-btn:hover:not(.active) {
             background-color: var(--bg-cream);
+        }
+
+        /* Akıllı Kurulum Paneli */
+        .setup-panel {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 1000px;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            justify-content: center;
+        }
+
+        .setup-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #dcdcdc;
+            background-color: var(--white);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+        }
+
+        .setup-pill:hover {
+            border-color: var(--champagne-gold);
+        }
+
+        .setup-pill.marked {
+            background-color: var(--sage-green);
+            color: var(--white);
+            border-color: var(--sage-green);
+        }
+
+        .setup-pill.active-target {
+            background-color: var(--butter-yellow);
+            color: var(--text-dark);
+            border-color: var(--champagne-gold);
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(200, 179, 130, 0.4);
+            transform: scale(1.05);
         }
 
         .status-bar {
@@ -117,7 +145,6 @@
             max-width: 1100px;
             width: 100%;
             border-radius: 4px;
-            overflow: hidden;
             background-color: var(--white);
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             cursor: default;
@@ -129,8 +156,9 @@
 
         #map-image {
             width: 100%;
+            height: auto;
             display: block;
-            pointer-events: none;
+            pointer-events: none; /* Tıklamalar container'a düşsün */
         }
 
         #markers-layer {
@@ -157,6 +185,17 @@
             z-index: 10;
         }
 
+        /* Test modu için ekstra vurgu */
+        .mountain-marker.test-btn {
+            background-color: transparent;
+            border: 2px solid transparent;
+        }
+        
+        .mountain-marker.test-btn:hover {
+            border: 2px solid var(--light-blue);
+            background-color: rgba(184, 216, 224, 0.3);
+        }
+
         .tooltip {
             position: absolute;
             background-color: var(--white);
@@ -179,15 +218,14 @@
     <h1>TÜRKİYE'NİN DAĞLARI</h1>
 
     <div class="controls">
-        <button id="btn-learn" class="active" onclick="setMode('learn')">Öğrenme Modu</button>
-        <button id="btn-test" onclick="setMode('test')">Test Modu</button>
-        <button id="btn-setup" class="setup-mode" onclick="setMode('setup')">Yer Belirleme (Öğretmen)</button>
+        <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
+        <button id="btn-test" class="main-btn" onclick="setMode('test')">Test Modu</button>
+        <button id="btn-setup" class="main-btn setup-mode" onclick="setMode('setup')">Yer Belirleme (Düzenle)</button>
     </div>
 
-    <!-- Sadece yer belirleme modunda görünen ekstra butonlar -->
-    <div class="setup-actions" id="setup-actions">
-        <button class="action-btn" onclick="undoLast()">Geri Al (Son İşaretleneni Sil)</button>
-        <button class="action-btn" onclick="resetAll()">Tümünü Sıfırla</button>
+    <!-- Akıllı Kurulum Paneli -->
+    <div class="setup-panel" id="setup-panel">
+        <!-- Etiketler JavaScript ile buraya eklenecek -->
     </div>
 
     <div class="status-bar" id="status-bar">
@@ -248,17 +286,18 @@
             { id: 'kivrim_21', name: "Güneydoğu Toroslar", group: "Kıvrım", num: 21 }
         ];
 
-        let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZen')) || {};
+        // Yeni anahtar kullandım, eski hatalı veriler karışmayacak
+        let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZenV2')) || {};
         let currentMode = 'learn';
         let currentTestMountain = null;
-        let setupIndex = Object.keys(savedCoords).length;
+        let activeSetupMountainId = null; // Şu an hangisi seçili?
 
         const mapImage = document.getElementById('map-image');
         const markersLayer = document.getElementById('markers-layer');
         const tooltip = document.getElementById('tooltip');
         const statusBar = document.getElementById('status-bar');
         const mapContainer = document.getElementById('map-container');
-        const setupActions = document.getElementById('setup-actions');
+        const setupPanel = document.getElementById('setup-panel');
 
         function initMap() {
             markersLayer.innerHTML = '';
@@ -276,6 +315,7 @@
                     marker.style.height = '18px';
                     marker.style.opacity = '1';
                     marker.style.backgroundColor = "rgba(200, 179, 130, 0.7)";
+                    marker.classList.remove('test-btn');
 
                     marker.addEventListener('mouseenter', () => {
                         tooltip.innerHTML = `<span style="color:var(--champagne-gold)">${mountain.group} ${mountain.num}</span><br>${mountain.name}`;
@@ -288,10 +328,12 @@
                         tooltip.style.opacity = '0';
                     });
                 } else if (currentMode === 'test') {
-                    marker.style.width = '40px'; 
-                    marker.style.height = '40px';
-                    marker.style.opacity = '0'; 
-                    marker.style.zIndex = '10'; // Test modunda üstte kalmasını sağlar
+                    // Alanı küçülttük (25px) ki birbirine geçmesin
+                    marker.style.width = '25px'; 
+                    marker.style.height = '25px';
+                    marker.style.opacity = '1'; // CSS ile şeffaf yapıp üzerine gelince mavi hover verdik
+                    marker.classList.add('test-btn'); 
+                    marker.style.zIndex = '10'; 
 
                     marker.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -300,13 +342,51 @@
                 } else if (currentMode === 'setup') {
                     marker.style.width = '12px';
                     marker.style.height = '12px';
-                    marker.style.opacity = '0.6';
-                    marker.style.backgroundColor = "var(--sage-green)";
-                    marker.style.border = "none";
+                    marker.style.opacity = '0.8';
+                    marker.style.backgroundColor = (activeSetupMountainId === mountain.id) ? "var(--butter-yellow)" : "var(--sage-green)";
+                    marker.style.border = (activeSetupMountainId === mountain.id) ? "2px solid var(--champagne-gold)" : "none";
+                    marker.classList.remove('test-btn');
                 }
 
                 markersLayer.appendChild(marker);
             });
+        }
+
+        function renderSetupPanel() {
+            setupPanel.innerHTML = '';
+            
+            mountains.forEach(mountain => {
+                const pill = document.createElement('div');
+                pill.className = 'setup-pill';
+                pill.textContent = `${mountain.group} ${mountain.num} - ${mountain.name}`;
+                
+                if (savedCoords[mountain.id]) pill.classList.add('marked');
+                if (activeSetupMountainId === mountain.id) pill.classList.add('active-target');
+
+                pill.onclick = () => {
+                    activeSetupMountainId = mountain.id;
+                    updateSetupStatus();
+                    renderSetupPanel(); // Pill renklerini güncelle
+                    initMap(); // Haritadaki noktayı sarart (eğer varsa)
+                };
+
+                setupPanel.appendChild(pill);
+            });
+        }
+
+        function updateSetupStatus() {
+            if (activeSetupMountainId) {
+                const current = mountains.find(m => m.id === activeSetupMountainId);
+                statusBar.innerHTML = `Lütfen haritada tıkla: <strong style="color: var(--champagne-gold); font-size: 20px;">${current.group} ${current.num} (${current.name})</strong>`;
+                statusBar.style.color = "var(--text-dark)";
+            } else {
+                statusBar.innerHTML = `Yukarıdaki listeden bir dağ seç ve haritadaki yerini tıkla. Yeşil olanlar işaretlenmiş demektir. (Yanlış işaretlediğini tekrar seçip tıklayarak düzeltebilirsin.)`;
+                statusBar.style.color = "var(--text-dark)";
+            }
+        }
+
+        function findNextUnmarked() {
+            return mountains.find(m => !savedCoords[m.id])?.id || null;
         }
 
         function setMode(mode) {
@@ -317,8 +397,7 @@
             document.getElementById(`btn-${mode}`).classList.add('active');
             tooltip.style.opacity = '0';
 
-            // Geri Al ve Sıfırla butonlarını sadece Setup modunda göster
-            setupActions.style.display = (mode === 'setup') ? 'flex' : 'none';
+            setupPanel.style.display = (mode === 'setup') ? 'flex' : 'none';
 
             if (mode === 'learn') {
                 mapContainer.classList.remove('setup-active');
@@ -339,66 +418,42 @@
             } else if (mode === 'setup') {
                 mapContainer.classList.add('setup-active');
                 mapImage.src = 'daglar_dolu.png.jpeg';
-                // Sıfırdan başlamıyoruz, kaldığı yerden devam ediyor
-                setupIndex = Object.keys(savedCoords).length;
-                askNextSetup();
+                
+                // Eğer seçili yoksa, işaretlenmemiş ilk dağı seç
+                if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked();
+                
+                renderSetupPanel();
+                updateSetupStatus();
             }
             initMap();
-        }
-
-        function askNextSetup() {
-            if (setupIndex < mountains.length) {
-                const current = mountains[setupIndex];
-                statusBar.innerHTML = `Lütfen tıklayarak işaretle: <strong style="color: var(--light-blue); font-size: 20px;">${current.group} Dağlar / Numara: ${current.num} (${current.name})</strong>`;
-                statusBar.style.color = "var(--text-dark)";
-            } else {
-                statusBar.innerHTML = `Harika! Tüm dağlar kaydedildi. Artık tam randımanlı test yapabilirsin.`;
-                statusBar.style.color = "var(--sage-green)";
-            }
         }
 
         function handleMapClick(event) {
-            if (currentMode !== 'setup' || setupIndex >= mountains.length) return;
+            if (currentMode !== 'setup' || !activeSetupMountainId) return;
 
-            const rect = mapContainer.getBoundingClientRect();
+            // KAYMA SORUNU ÇÖZÜMÜ: Koordinatları doğrudan resmin bounding box'ı üzerinden alıyoruz.
+            const rect = mapImage.getBoundingClientRect();
+            
+            // Eğer tıklama resmin dışındaysa (örn. alttaki boşluk) yoksay
+            if (event.clientY < rect.top || event.clientY > rect.bottom || event.clientX < rect.left || event.clientX > rect.right) {
+                return; 
+            }
+
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-            const current = mountains[setupIndex];
-            savedCoords[current.id] = { x: x, y: y };
+            savedCoords[activeSetupMountainId] = { x: x, y: y };
+            localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
             
-            localStorage.setItem('daglarCoordsCoreZen', JSON.stringify(savedCoords));
+            // Sıradaki işaretsiz dağı otomatik seç (hızlı işaretleme için)
+            activeSetupMountainId = findNextUnmarked();
             
-            setupIndex++;
-            initMap();
-            askNextSetup();
-        }
-
-        function undoLast() {
-            if (setupIndex > 0) {
-                setupIndex--;
-                const lastMountain = mountains[setupIndex];
-                delete savedCoords[lastMountain.id];
-                localStorage.setItem('daglarCoordsCoreZen', JSON.stringify(savedCoords));
-                initMap();
-                askNextSetup();
-            } else {
-                alert("Geri alınacak işaretleme kalmadı.");
-            }
-        }
-
-        function resetAll() {
-            if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
-                savedCoords = {};
-                localStorage.removeItem('daglarCoordsCoreZen');
-                setupIndex = 0;
-                initMap();
-                askNextSetup();
-            }
+            renderSetupPanel();
+            updateSetupStatus();
+            initMap(); 
         }
 
         function startTest() {
-            // Sadece koordinatı belirlenmiş dağlar arasından soru sorar
             const markedMountains = mountains.filter(m => savedCoords[m.id]);
             const randomIndex = Math.floor(Math.random() * markedMountains.length);
             currentTestMountain = markedMountains[randomIndex].name;
@@ -411,12 +466,12 @@
             if (clickedMountain === currentTestMountain) {
                 statusBar.textContent = `Doğru! Orası ${currentTestMountain}.`;
                 statusBar.style.color = "var(--sage-green)";
-                marker.style.opacity = '1';
                 marker.style.backgroundColor = "var(--sage-green)";
                 marker.style.borderColor = "var(--sage-green)";
                 
                 setTimeout(() => {
-                    marker.style.opacity = '0';
+                    marker.style.backgroundColor = "transparent";
+                    marker.style.borderColor = "transparent";
                     startTest();
                 }, 1500);
             } else {
@@ -425,7 +480,7 @@
             }
         }
 
-        // Sayfa açıldığında Öğrenme modu ile başlasın
+        // Başlangıç
         setMode('learn');
     </script>
 </body>
