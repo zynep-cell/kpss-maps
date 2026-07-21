@@ -32,6 +32,31 @@
             padding: 40px 20px;
         }
 
+        .nav-bar {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--champagne-gold);
+            border: 1px solid var(--champagne-gold);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            background-color: var(--champagne-gold);
+            color: var(--white);
+        }
+
         h1 {
             font-weight: 300;
             letter-spacing: 3px;
@@ -284,6 +309,10 @@
     </style>
 </head>
 <body>
+
+    <div class="nav-bar">
+        <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
+    </div>
 
     <h1>TÜRKİYE'NİN AKARSULARI</h1>
 
@@ -538,6 +567,10 @@
             statusBar.style.color = "var(--text-dark)";
         }
 
+        (function() {
+            // Test mode check answer helper
+        })();
+
         function checkAnswer(clickedRiver, marker) {
             if (clickedRiver === currentTestRiver) {
                 statusBar.textContent = `Doğru! Orası ${currentTestRiver}.`;
@@ -557,11 +590,6 @@
         }
 
         setMode('learn');
-        <div style="width: 100%; max-width: 1100px; display: flex; justify-content: flex-start; margin-bottom: 10px;">
-    <a href="index.html" style="text-decoration: none; color: var(--champagne-gold); border: 1px solid var(--champagne-gold); padding: 6px 16px; border-radius: 20px; font-size: 13px; transition: all 0.3s ease; background-color: var(--white);">← Ana Menüye Dön</a>
-</div>
-
-<h1>TÜRKİYE'NİN AKARSULARI</h1>
     </script>
 </body>
 </html>
