@@ -173,30 +173,17 @@
             line-height: 0;
             font-size: 0;
             display: block;
-            overflow: hidden;
         }
 
         .map-container.setup-active {
             cursor: crosshair;
         }
 
-        /* Ana iskelet her zaman bu görselin boyutu olacak */
-        #map-dolu {
+        /* Tek bir interaktif görsel var, hep boş harita */
+        #map-image {
             width: 100%;
             height: auto;
             display: block;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Boş harita dolu haritanın kılığına girip tam üstüne oturuyor */
-        #map-bos {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%; 
-            display: none;
             pointer-events: none;
         }
 
@@ -253,6 +240,49 @@
             white-space: nowrap;
             line-height: 1.4;
         }
+
+        /* Yeni Hint (Kopya) Bölümü */
+        .hint-section {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .hint-toggle-btn {
+            background-color: var(--white);
+            border: 1px dashed var(--sage-green);
+            color: var(--sage-green);
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .hint-toggle-btn:hover {
+            background-color: var(--sage-green);
+            color: var(--white);
+        }
+
+        .hint-image-container {
+            display: none; /* Başlangıçta gizli */
+            margin-top: 15px;
+            width: 100%;
+            border: 2px dashed var(--champagne-gold);
+            border-radius: 8px;
+            padding: 10px;
+            background-color: var(--white);
+        }
+
+        .hint-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -276,12 +306,19 @@
         Harita üzerinde gezinerek dağları öğrenebilirsin.
     </div>
 
+    <!-- ANA İŞLEM ZEMİNİ (SADECE BOŞ HARİTA) -->
     <div class="map-container" id="map-container" onclick="handleMapClick(event)">
-        <!-- İki görseli de sisteme gömdük -->
-        <img id="map-dolu" src="daglar_dolu.png.jpeg" alt="Türkiye Dağlar Dolu Haritası">
-        <img id="map-bos" src="daglar_bos.png.jpeg" alt="Türkiye Dağlar Boş Haritası">
+        <img id="map-image" src="daglar_bos.png.jpeg" alt="Türkiye Dağlar Boş Haritası">
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
+    </div>
+
+    <!-- KOPYA (HİNT) KÖŞESİ -->
+    <div class="hint-section">
+        <button class="hint-toggle-btn" onclick="toggleHint()">Dolu Haritayı (Kopya) Aç / Kapat</button>
+        <div class="hint-image-container" id="hint-container">
+            <img src="daglar_dolu.png.jpeg" alt="Türkiye Dağlar Dolu Haritası">
+        </div>
     </div>
 
     <script>
@@ -327,19 +364,26 @@
             { id: 'kivrim_21', name: "Güneydoğu Toroslar", group: "Kıvrım", num: 21 }
         ];
 
-        let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZenV2')) || {};
+        let savedCoords = JSON.parse(localStorage.getItem('daglarCoordsCoreZenV3')) || {}; // Yeni versiyon anahtarı
         let currentMode = 'learn';
         let currentTestMountain = null;
         let activeSetupMountainId = null;
 
-        const mapDolu = document.getElementById('map-dolu');
-        const mapBos = document.getElementById('map-bos');
         const markersLayer = document.getElementById('markers-layer');
         const tooltip = document.getElementById('tooltip');
         const statusBar = document.getElementById('status-bar');
         const mapContainer = document.getElementById('map-container');
         const setupPanel = document.getElementById('setup-panel');
         const setupActions = document.getElementById('setup-actions');
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-container');
+            if (hintBox.style.display === 'none' || hintBox.style.display === '') {
+                hintBox.style.display = 'block';
+            } else {
+                hintBox.style.display = 'none';
+            }
+        }
 
         function initMap() {
             markersLayer.innerHTML = '';
@@ -443,8 +487,6 @@
 
             if (mode === 'learn') {
                 mapContainer.classList.remove('setup-active');
-                mapDolu.style.opacity = '1';
-                mapBos.style.display = 'none';
                 
                 statusBar.innerHTML = Object.keys(savedCoords).length === 0 
                     ? "Önce <strong>Yer Belirleme</strong> moduna girerek dağların konumlarını işaretlemelisin." 
@@ -458,15 +500,9 @@
                     return;
                 }
                 
-                // Püf Noktası: Dolu haritayı şeffaf yapıyoruz (boyutu korumak için), boş haritayı görünür kılıyoruz
-                mapDolu.style.opacity = '0';
-                mapBos.style.display = 'block';
-                
                 startTest();
             } else if (mode === 'setup') {
                 mapContainer.classList.add('setup-active');
-                mapDolu.style.opacity = '1';
-                mapBos.style.display = 'none';
                 
                 if (!activeSetupMountainId) activeSetupMountainId = findNextUnmarked() || mountains[0].id;
                 
@@ -487,7 +523,7 @@
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
             savedCoords[activeSetupMountainId] = { x: x, y: y };
-            localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
+            localStorage.setItem('daglarCoordsCoreZenV3', JSON.stringify(savedCoords));
             
             activeSetupMountainId = findNextUnmarked();
             
@@ -499,7 +535,7 @@
         function clearSelected() {
             if (activeSetupMountainId && savedCoords[activeSetupMountainId]) {
                 delete savedCoords[activeSetupMountainId];
-                localStorage.setItem('daglarCoordsCoreZenV2', JSON.stringify(savedCoords));
+                localStorage.setItem('daglarCoordsCoreZenV3', JSON.stringify(savedCoords));
                 renderSetupPanel();
                 updateSetupStatus();
                 initMap();
@@ -509,7 +545,7 @@
         function resetAll() {
             if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
                 savedCoords = {};
-                localStorage.removeItem('daglarCoordsCoreZenV2');
+                localStorage.removeItem('daglarCoordsCoreZenV3');
                 activeSetupMountainId = mountains[0].id;
                 renderSetupPanel();
                 updateSetupStatus();
