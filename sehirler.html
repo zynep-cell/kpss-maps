@@ -138,6 +138,11 @@
             line-height: 0;
             font-size: 0;
             overflow: hidden;
+            cursor: default;
+        }
+
+        .map-container.setup-active {
+            cursor: crosshair;
         }
 
         #map-image {
@@ -212,7 +217,7 @@
             border-radius: 8px;
             font-family: monospace;
             font-size: 12px;
-            max-height: 150px;
+            max-height: 180px;
             overflow-y: auto;
             display: none;
             border: 1px solid var(--champagne-gold);
@@ -228,13 +233,13 @@
     <h1>TÜRKİYE İLLERİ VE FONKSİYONEL MERKEZLER</h1>
 
     <div class="info-box">
-        <p>📌 <strong>Modül:</strong> Orijinal harita görseli (`sehirler_bos.png.jpeg`) üzerinde çalışmaktadır. <span style="color:var(--sage-green); font-weight:bold;">Yeşil noktalar büyükşehirleri</span>, <span style="color:var(--champagne-gold); font-weight:bold;">Gold noktalar diğer illeri</span> gösterir.</p>
+        <p>📌 <strong>Öğretme / Setup Modu:</strong> Harita üzerinde noktaları kendin yerleştirmek için <strong>Setup</strong> modunu seçebilir, tıkladığın yerin koordinatlarını anında kopyalayabilirsin.</p>
     </div>
 
     <div class="controls">
         <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
         <button id="btn-test" class="main-btn" onclick="setMode('test')">Test Modu</button>
-        <button id="btn-setup" class="main-btn" onclick="setMode('setup')">Setup (Koordinat)</button>
+        <button id="btn-setup" class="main-btn" onclick="setMode('setup')">Setup (Koordinat Al)</button>
     </div>
 
     <div class="status-bar" id="status-bar">
@@ -242,16 +247,15 @@
     </div>
 
     <div class="map-container" id="map-container" onclick="handleMapClick(event)">
-        <!-- Orijinal Yerel Harita Görseli -->
         <img id="map-image" src="sehirler_bos.png.jpeg" alt="Türkiye Boş Haritası">
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
-    <textarea id="setup-output" readonly placeholder="Setup modunda haritaya tıkladığında koordinatlar burada belirir..."></textarea>
+    <textarea id="setup-output" readonly placeholder="Setup modunda haritaya tıkladığında x ve y değerleri burada görünecek..."></textarea>
 
     <script>
-        // İller Veritabanı (Büyükşehir, Sınıflandırma ve Hava Kirliliği Tipleri)
+        // Tüm İller Veritabanı (Büyükşehir, Sınıflandırma ve Hava Kirliliği Tipleri)
         const allCities = [
             { name: "İstanbul", region: "Marmara", big: true, type: "Sanayi, Ulaşım, Turizm, Liman, Ticaret", air: "Los Angeles Tipi (Trafik/Egzoz yoğun)", x: 19.5, y: 15.0 },
             { name: "Ankara", region: "İç Anadolu", big: true, type: "Ulaşım, İdari", air: "Los Angeles & Londra Karma", x: 42.5, y: 35.0 },
@@ -283,8 +287,6 @@
             { name: "Mardin", region: "Güneydoğu", big: true, type: "Turizm, Tarım", air: "Temiz / Yamaç konumu", x: 79.5, y: 77.0 },
             { name: "Muğla", region: "Ege", big: true, type: "Turizm", air: "Temiz / Kıyı esintili", x: 16.0, y: 77.0 },
             { name: "Ordu", region: "Karadeniz", big: true, type: "Tarım", air: "Temiz / Kıyı", x: 66.5, y: 22.0 },
-
-            // Diğer Önemli İller (Maden, Sanayi, Ulaşım vb.)
             { name: "Zonguldak", region: "Karadeniz", big: false, type: "Maden, Sanayi, Liman", air: "Londra Tipi (Taşkömürü havzası dumanı)", x: 34.5, y: 19.5 },
             { name: "Batman", region: "Güneydoğu", big: false, type: "Maden, Enerji", air: "Los Angeles Tipi (Rafineri ve akaryakıt)", x: 82.5, y: 69.0 },
             { name: "Karabük", region: "Karadeniz", big: false, type: "Maden, Sanayi", air: "Londra Tipi (Demir-çelik ve vadi)", x: 39.5, y: 22.5 },
@@ -302,6 +304,7 @@
         const tooltip = document.getElementById('tooltip');
         const statusBar = document.getElementById('status-bar');
         const setupOutput = document.getElementById('setup-output');
+        const mapContainer = document.getElementById('map-container');
 
         function initMap() {
             markersLayer.innerHTML = '';
@@ -344,6 +347,12 @@
             document.getElementById(`btn-${mode}`).classList.add('active');
             tooltip.style.opacity = '0';
             setupOutput.style.display = (mode === 'setup') ? 'block' : 'none';
+            
+            if (mode === 'setup') {
+                mapContainer.classList.add('setup-active');
+            } else {
+                mapContainer.classList.remove('setup-active');
+            }
 
             if (mode === 'learn') {
                 statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek özelliklerini inceleyebilirsin.";
@@ -351,7 +360,7 @@
             } else if (mode === 'test') {
                 startTest();
             } else if (mode === 'setup') {
-                statusBar.innerHTML = "SETUP MODU: Harita üzerinde herhangi bir yere tıklayarak x ve y yüzdelik koordinatlarını alabilirsin.";
+                statusBar.innerHTML = "SETUP MODU: Haritada istediğin yere tıkla, x ve y yüzdelik koordinatları aşağıda listelenecek.";
                 statusBar.style.color = "var(--champagne-gold)";
             }
             initMap();
@@ -363,7 +372,7 @@
             const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
             const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
             
-            const newText = `{ name: "Yeni_Il", region: "Bolge", big: false, type: "Tür", air: "Kirlilik Tipi", x: ${x}, y: ${y} },\n`;
+            const newText = `{ name: "Sehir_Adi", region: "Bolge", big: false, type: "Tür", air: "Kirlilik", x: ${x}, y: ${y} },\n`;
             setupOutput.value += newText;
             setupOutput.scrollTop = setupOutput.scrollHeight;
         }
