@@ -141,7 +141,7 @@
             cursor: default;
         }
 
-        .map-container.setup-active {
+        .map-container.setup-mode {
             cursor: crosshair;
         }
 
@@ -186,11 +186,6 @@
             z-index: 20;
         }
 
-        .city-marker.test-btn {
-            background-color: #d1c7bd;
-            border-color: var(--white);
-        }
-
         .tooltip {
             position: absolute;
             background-color: var(--white);
@@ -208,19 +203,59 @@
             line-height: 1.4;
         }
 
-        #setup-output {
+        /* Setup / Öğretme Modu Kontrol Paneli */
+        #setup-panel {
             margin-top: 15px;
             width: 100%;
             max-width: 1150px;
             background: #fff;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 180px;
-            overflow-y: auto;
             display: none;
             border: 1px solid var(--champagne-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .setup-header {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--champagne-gold);
+            margin-bottom: 12px;
+        }
+
+        .setup-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .setup-row select, .setup-row input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .setup-row select {
+            flex: 1;
+            min-width: 180px;
+            background-color: #fff;
+        }
+
+        #setup-output {
+            width: 100%;
+            height: 120px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: var(--bg-cream);
+            resize: vertical;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -233,13 +268,13 @@
     <h1>TÜRKİYE İLLERİ VE FONKSİYONEL MERKEZLER</h1>
 
     <div class="info-box">
-        <p>📌 <strong>Öğretme / Setup Modu:</strong> Harita üzerinde noktaları kendin yerleştirmek için <strong>Setup</strong> modunu seçebilir, tıkladığın yerin koordinatlarını anında kopyalayabilirsin.</p>
+        <p>📌 <strong>Bilgi:</strong> Harita üzerindeki konumları beğenmiyorsan <strong>Öğretme Modu (Setup)</strong> açarak dilediğin şehri harita üzerinde istediğin yere tıklayıp kusursuzca yerleştirebilirsin.</p>
     </div>
 
     <div class="controls">
         <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
         <button id="btn-test" class="main-btn" onclick="setMode('test')">Test Modu</button>
-        <button id="btn-setup" class="main-btn" onclick="setMode('setup')">Setup (Koordinat Al)</button>
+        <button id="btn-setup" class="main-btn" onclick="setMode('setup')">Öğretme Modu (Setup)</button>
     </div>
 
     <div class="status-bar" id="status-bar">
@@ -252,11 +287,22 @@
         <div id="tooltip" class="tooltip"></div>
     </div>
 
-    <textarea id="setup-output" readonly placeholder="Setup modunda haritaya tıkladığında x ve y değerleri burada görünecek..."></textarea>
+    <!-- Öğretme / Yerleştirme Paneli -->
+    <div id="setup-panel">
+        <div class="setup-header">🛠️ Harita Öğretme ve Konumlandırma Paneli</div>
+        <div class="setup-row">
+            <select id="city-select">
+                <option value="">-- Yerleştirilecek Şehri Seçin --</option>
+            </select>
+            <span id="coord-display" style="font-size: 13px; font-weight: 500; color: var(--text-dark);">Seçilen Koordinat: (Haritaya tıklayın)</span>
+        </div>
+        <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Yukarıdan şehri seçip haritada doğru yerine tıkladığında, aşağıdaki alanda güncellenmiş kod satırı belirecektir:</p>
+        <textarea id="setup-output" readonly placeholder="Haritaya tıkladığınızda güncel kod burada görünecek..."></textarea>
+    </div>
 
     <script>
-        // Tüm İller Veritabanı (Büyükşehir, Sınıflandırma ve Hava Kirliliği Tipleri)
-        const allCities = [
+        // Tüm İller Veritabanı
+        let allCities = [
             { name: "İstanbul", region: "Marmara", big: true, type: "Sanayi, Ulaşım, Turizm, Liman, Ticaret", air: "Los Angeles Tipi (Trafik/Egzoz yoğun)", x: 19.5, y: 15.0 },
             { name: "Ankara", region: "İç Anadolu", big: true, type: "Ulaşım, İdari", air: "Los Angeles & Londra Karma", x: 42.5, y: 35.0 },
             { name: "İzmir", region: "Ege", big: true, type: "Ulaşım, Turizm, Liman, Ticaret", air: "Los Angeles Tipi (Trafik ve Egzoz)", x: 12.0, y: 55.0 },
@@ -303,8 +349,23 @@
         const markersLayer = document.getElementById('markers-layer');
         const tooltip = document.getElementById('tooltip');
         const statusBar = document.getElementById('status-bar');
-        const setupOutput = document.getElementById('setup-output');
         const mapContainer = document.getElementById('map-container');
+        const setupPanel = document.getElementById('setup-panel');
+        const citySelect = document.getElementById('city-select');
+        const coordDisplay = document.getElementById('coord-display');
+        const setupOutput = document.getElementById('setup-output');
+
+        // Şehir seçme listesini doldur
+        function populateCitySelect() {
+            citySelect.innerHTML = '<option value="">-- Yerleştirilecek Şehri Seçin --</option>';
+            allCities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name + (c.big ? ' (Büyükşehir)' : '');
+                citySelect.appendChild(opt);
+            });
+        }
+        populateCitySelect();
 
         function initMap() {
             markersLayer.innerHTML = '';
@@ -346,12 +407,12 @@
             document.getElementById('btn-setup').classList.remove('active');
             document.getElementById(`btn-${mode}`).classList.add('active');
             tooltip.style.opacity = '0';
-            setupOutput.style.display = (mode === 'setup') ? 'block' : 'none';
             
+            setupPanel.style.display = (mode === 'setup') ? 'block' : 'none';
             if (mode === 'setup') {
-                mapContainer.classList.add('setup-active');
+                mapContainer.classList.add('setup-mode');
             } else {
-                mapContainer.classList.remove('setup-active');
+                mapContainer.classList.remove('setup-mode');
             }
 
             if (mode === 'learn') {
@@ -360,7 +421,7 @@
             } else if (mode === 'test') {
                 startTest();
             } else if (mode === 'setup') {
-                statusBar.innerHTML = "SETUP MODU: Haritada istediğin yere tıkla, x ve y yüzdelik koordinatları aşağıda listelenecek.";
+                statusBar.innerHTML = "ÖĞRETME MODU: Açılır menüden şehir seçip haritada tam yerine tıkla.";
                 statusBar.style.color = "var(--champagne-gold)";
             }
             initMap();
@@ -368,13 +429,26 @@
 
         function handleMapClick(event) {
             if (currentMode !== 'setup') return;
+            const selectedCityName = citySelect.value;
+            if (!selectedCityName) {
+                alert("Lütfen önce listeden yerleştirmek istediğiniz şehri seçin!");
+                return;
+            }
+
             const rect = event.currentTarget.getBoundingClientRect();
             const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
             const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
             
-            const newText = `{ name: "Sehir_Adi", region: "Bolge", big: false, type: "Tür", air: "Kirlilik", x: ${x}, y: ${y} },\n`;
-            setupOutput.value += newText;
-            setupOutput.scrollTop = setupOutput.scrollHeight;
+            coordDisplay.textContent = `Seçilen: ${selectedCityName} -> x: ${x}, y: ${y}`;
+
+            // Veritabanındaki ilgili şehrin koordinatını güncelle
+            const cityObj = allCities.find(c => c.name === selectedCityName);
+            if (cityObj) {
+                cityObj.x = parseFloat(x);
+                cityObj.y = parseFloat(y);
+                setupOutput.value += `{ name: "${cityObj.name}", region: "${cityObj.region}", big: ${cityObj.big}, type: "${cityObj.type}", air: "${cityObj.air}", x: ${x}, y: ${y} },\n`;
+            }
+            initMap();
         }
 
         function startTest() {
