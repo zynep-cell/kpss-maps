@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Zen - Türkiye'nin Büyükşehirleri Hafıza Merkezi</title>
+    <title>Core Zen - Türkiye'nin Tüm İlleri ve Büyükşehirleri</title>
     <style>
         :root {
             --bg-cream: #fcfbf9;
@@ -29,12 +29,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
         .nav-bar {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
             display: flex;
             justify-content: flex-start;
             margin-bottom: 15px;
@@ -67,7 +67,7 @@
         }
 
         .info-box {
-            max-width: 1100px;
+            max-width: 1150px;
             width: 100%;
             background-color: var(--white);
             border-left: 4px solid var(--champagne-gold);
@@ -113,51 +113,32 @@
         .status-bar {
             min-height: 40px;
             margin-bottom: 20px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 400;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            transition: color 0.3s ease;
             background-color: var(--white);
             padding: 10px 30px;
             border-radius: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.02);
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
         }
 
         .map-container {
             position: relative;
-            max-width: 1100px;
+            max-width: 1150px;
             width: 100%;
-            height: 550px;
+            height: 600px;
             border-radius: 8px;
-            background-color: var(--white);
+            background-color: #f7f6f2;
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             overflow: hidden;
-            border: 1px solid #eaeaea;
-        }
-
-        /* Güvenli ve şık Shibumi tabanlı Türkiye silüet alanı */
-        .map-bg-canvas {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #fcfbf9 0%, #f4f1ea 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .map-grid-pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0.15;
-            background-image: radial-gradient(var(--champagne-gold) 1px, transparent 1px);
-            background-size: 25px 25px;
+            border: 1px solid #eae6df;
+            background-image: linear-gradient(rgba(200,179,130,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200,179,130,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
 
         #markers-layer {
@@ -170,38 +151,38 @@
 
         .city-marker {
             position: absolute;
-            background-color: rgba(200, 179, 130, 0.85);
+            background-color: var(--champagne-gold);
             border: 2px solid var(--white);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.2s ease;
-            width: 16px;
-            height: 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .city-marker.big-city {
+            background-color: var(--sage-green);
+            width: 15px;
+            height: 15px;
         }
 
         .city-marker:hover {
             background-color: var(--butter-yellow);
-            transform: translate(-50%, -50%) scale(1.4);
-            z-index: 10;
+            transform: translate(-50%, -50%) scale(1.5);
+            z-index: 20;
         }
 
         .city-marker.test-btn {
-            background-color: var(--sage-green);
+            background-color: #d1c7bd;
             border-color: var(--white);
-        }
-        
-        .city-marker.test-btn:hover {
-            border-color: var(--champagne-gold);
-            background-color: var(--butter-yellow);
-            transform: translate(-50%, -50%) scale(1.3);
         }
 
         .tooltip {
             position: absolute;
             background-color: var(--white);
-            padding: 8px 14px;
+            padding: 10px 14px;
             border-radius: 6px;
             font-size: 13px;
             font-weight: 500;
@@ -210,7 +191,7 @@
             transition: opacity 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-left: 3px solid var(--champagne-gold);
-            z-index: 20;
+            z-index: 30;
             white-space: nowrap;
             line-height: 1.4;
         }
@@ -222,10 +203,10 @@
         <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
     </div>
 
-    <h1>TÜRKİYE'NİN 30 BÜYÜKŞEHİRİ</h1>
+    <h1>TÜRKİYE'NİN İLLERİ VE KPSS BİLGİ MERKEZİ</h1>
 
     <div class="info-box">
-        <p>📌 <strong>Öğrenme ve Test Merkezi:</strong> Hiçbir harita yükleme derdi olmadan 30 büyükşehir konumlandırılmıştır. Üzerlerine gelerek ya da test modunda çözerek pratik yapabilirsin.</p>
+        <p>📌 <strong>Modül Bilgisi:</strong> Türkiye'nin 81 ilinin tamamı yer almaktadır. <span style="color: var(--sage-green); font-weight: bold;">Yeşil noktalar büyükşehirleri</span>, <span style="color: var(--champagne-gold); font-weight: bold;">gold noktalar diğer illeri</span> simgeler. KPSS'de soru potansiyeli olan ayırt edici özellikleri inceleyebilirsin.</p>
     </div>
 
     <div class="controls">
@@ -234,51 +215,111 @@
     </div>
 
     <div class="status-bar" id="status-bar">
-        Harita üzerinde büyükşehirlerin üzerine gelerek detayları öğrenebilirsin.
+        Harita üzerinde illerin üzerine gelerek KPSS özelliklerini görebilirsin.
     </div>
 
     <div class="map-container" id="map-container">
-        <div class="map-bg-canvas">
-            <div class="map-grid-pattern"></div>
-            <span style="position: absolute; color: var(--champagne-gold); opacity: 0.3; font-size: 28px; letter-spacing: 5px; font-weight: 300; pointer-events: none;">TÜRKİYE BÜYÜKŞEHİRLER HARİTASI</span>
-            <div id="markers-layer"></div>
-            <div id="tooltip" class="tooltip"></div>
-        </div>
+        <div id="markers-layer"></div>
+        <div id="tooltip" class="tooltip"></div>
     </div>
 
     <script>
-        // Türkiye'nin 30 Büyükşehri ve coğrafi konum oranları (Harita tuvali üzerinde nokta dağılımı)
-        const bigCities = [
-            { id: 'c_ist', name: "İstanbul", region: "Marmara", feat: "En kalabalık kent, iki yaka", x: 18.0, y: 24.0 },
-            { id: 'c_ank', name: "Ankara", region: "İç Anadolu", feat: "Başkent, ülke merkezi", x: 42.0, y: 45.0 },
-            { id: 'c_izm', name: "İzmir", region: "Ege", feat: "Ege'nin inci limanı", x: 12.5, y: 56.0 },
-            { id: 'c_bur', name: "Bursa", region: "Marmara", feat: "İlk Osmanlı başkenti, sanayi", x: 23.0, y: 35.0 },
-            { id: 'c_ant', name: "Antalya", region: "Akdeniz", feat: "Turizm başkenti, narenciye", x: 32.0, y: 78.0 },
-            { id: 'c_ada', name: "Adana", region: "Akdeniz", feat: "Çukurova'nın kalbi", x: 51.0, y: 74.0 },
-            { id: 'c_kon', name: "Konya", region: "İç Anadolu", feat: "Yüzölçümü en büyük ilimiz", x: 45.0, y: 62.0 },
-            { id: 'c_gaz', name: "Gaziantep", region: "Güneydoğu Anadolu", feat: "Gastronomi ve ticaret merkezi", x: 63.0, y: 73.0 },
-            { id: 'c_mer', name: "Mersin", region: "Akdeniz", feat: "Önemli liman kenti", x: 47.0, y: 80.0 },
-            { id: 'c_diy', name: "Diyarbakır", region: "Güneydoğu Anadolu", feat: "Tarih ve kültür merkezi, surlar", x: 75.0, y: 64.0 },
-            { id: 'c_ord', name: "Ordu", region: "Karadeniz", feat: "Fındık üretiminin başkenti", x: 66.0, y: 30.0 },
-            { id: 'c_sam', name: "Samsun", region: "Karadeniz", feat: "Orta Karadeniz limanı", x: 54.0, y: 27.0 },
-            { id: 'c_tra', name: "Trabzon", region: "Karadeniz", feat: "Doğu Karadeniz ticaret şehri", x: 79.0, y: 28.0 },
-            { id: 'c_erz', name: "Erzurum", region: "Doğu Anadolu", feat: "Kış turizmi ve geçit merkezi", x: 84.5, y: 35.0 },
-            { id: 'c_mal', name: "Malatya", region: "Doğu Anadolu", feat: "Kayısı diyarı", x: 68.0, y: 56.0 },
-            { id: 'c_kah', name: "Kahramanmaraş", region: "Akdeniz", feat: "Dondurma ve pamuk merkezi", x: 58.0, y: 66.0 },
-            { id: 'c_san', name: "Şanlıurfa", region: "Güneydoğu Anadolu", feat: "Peygamberler şehri, GAP", x: 70.5, y: 72.0 },
-            { id: 'c_ayd', name: "Aydın", region: "Ege", feat: "İncir ve zeytin merkezi", x: 15.5, y: 67.0 },
-            { id: 'c_den', name: "Denizli", region: "Ege", feat: "Pamukkale travertenleri", x: 23.5, y: 68.0 },
-            { id: 'c_man', name: "Manisa", region: "Ege", feat: "Mesir macunu, tarım kenti", x: 16.0, y: 48.0 },
-            { id: 'c_bal', name: "Balıkesir", region: "Marmara", feat: "İki denize kıyısı olan il", x: 16.5, y: 34.0 },
-            { id: 'c_tek', name: "Tekirdağ", region: "Marmara", feat: "Trakya'nın liman kenti", x: 12.0, y: 26.0 },
-            { id: 'c_sak', name: "Sakarya", region: "Marmara", feat: "Otomotiv ve tarım (Adapazarı)", x: 29.0, y: 28.0 },
-            { id: 'c_koc', name: "Kocaeli", region: "Marmara", feat: "Sanayi kalbi (İzmit)", x: 25.5, y: 27.0 },
-            { id: 'c_esk', name: "Eskişehir", region: "İç Anadolu", feat: "Öğrenci kenti, lületaşı", x: 34.0, y: 40.0 },
-            { id: 'c_kys', name: "Kayseri", region: "İç Anadolu", feat: "Erciyes eteklerinde sanayi", x: 55.0, y: 51.0 },
-            { id: 'c_hat', name: "Hatay", region: "Akdeniz", feat: "Medeniyetler buluşması (Antakya)", x: 56.0, y: 84.0 },
-            { id: 'c_van', name: "Van", region: "Doğu Anadolu", feat: "Göl kıyısında tarihi kent", x: 93.0, y: 60.0 },
-            { id: 'c_mar', name: "Mardin", region: "Güneydoğu Anadolu", feat: "Taş evleri ve tarihi doku", x: 78.0, y: 73.0 },
-            { id: 'c_mug', name: "Muğla", region: "Ege / Akdeniz", feat: "Turizm cenneti koylar", x: 19.5, y: 78.0 }
+        // Türkiye'nin 81 İli - Koordinatları ve KPSS'ye Yönelik Ayırt Edici Özellikleri
+        const allCities = [
+            // Marmara
+            { name: "İstanbul", region: "Marmara", big: true, kpss: "Nüfus, ticaret, finans ve turizm merkezi; iki yaka", x: 18, y: 24 },
+            { name: "Edirne", region: "Marmara", big: false, kpss: "Sınır kapısı (Kapıkule), Selimiye Camii", x: 7, y: 19 },
+            { name: "Kırklareli", region: "Marmara", big: false, kpss: "Istranca (Yıldız) Dağları,çoğunlukla meşe ormanları", x: 10, y: 15 },
+            { name: "Tekirdağ", region: "Marmara", big: true, kpss: "Trakya'nın liman ve yoğun sanayi kenti", x: 12, y: 25 },
+            { name: "Çanakkale", region: "Marmara", big: false, kpss: "Boğazlar, Kaz Dağı, turizm ve zeytincilik", x: 10, y: 35 },
+            { name: "Balıkesir", region: "Marmara", big: true, kpss: "Zeytin, zeytinyağı, kaplıcalar ve iki denize kıyı", x: 16, y: 34 },
+            { name: "Bursa", region: "Marmara", big: true, kpss: "Otomotiv sanayi, kestane şekeri, Uludağ", x: 23, y: 35 },
+            { name: "Yalova", region: "Marmara", big: false, kpss: "En küçük yüzölçümlü il, süs bitkiciliği", x: 23, y: 29 },
+            { name: "Kocaeli", region: "Marmara", big: true, kpss: "Türkiye'nin sanayi kalbi, petrokimya (İzmit)", x: 25.5, y: 27 },
+            { name: "Sakarya", region: "Marmara", big: true, kpss: "Adapazarı Ovası, mobilya ve otomotiv sanayi", x: 29, y: 28 },
+            { name: "Bilecik", region: "Marmara", big: false, kpss: "Seramik ve mermer üretimi, tarihi geçit noktası", x: 30, y: 35 },
+
+            // Ege
+            { name: "İzmir", region: "Ege", big: true, kpss: "Ege'nin en büyük limanı, ihraç limanı, turizm", x: 12.5, y: 56 },
+            { name: "Manisa", region: "Ege", big: true, kpss: "Gediz Ovası, üzüm, tütün ve Vestel üssü", x: 16, y: 48 },
+            { name: "Aydın", region: "Ege", big: true, kpss: "İncir, zeytin, jeotermal enerji potansiyeli", x: 15.5, y: 67 },
+            { name: "Muğla", region: "Ege", big: true, kpss: "En çok koy/körfeze sahip, turizm, mermer ve çam balı", x: 19.5, y: 78 },
+            { name: "Denizli", region: "Ege", big: true, kpss: "Pamukkale travertenleri, tekstil ve mermercilik", x: 23.5, y: 68 },
+            { name: "Uşak", region: "Ege", big: false, kpss: "Halıcılık ve battaniye üretimi, ilk şeker fabrikası", x: 23, y: 52 },
+            { name: "Kütahya", region: "Ege", big: false, kpss: "Porselen, çini ve linyit (termik santral) yatakları", x: 27, y: 43 },
+            { name: "Afyonkarahisar", region: "Ege", big: false, kpss: "Kavşak noktası, termal turizm, haşhaş ve mermer", x: 32, y: 53 },
+
+            // İç Anadolu
+            { name: "Ankara", region: "İç Anadolu", big: true, kpss: "Başkent, idari merkez, demiryolu kavşağı", x: 42, y: 45 },
+            { name: "Eskişehir", region: "Ege/İç Anadolu", big: true, kpss: "Lületaşı, havacılık sanayi, öğrenci kenti", x: 34, y: 40 },
+            { name: "Konya", region: "İç Anadolu", big: true, kpss: "Yüzölçümü en büyük, tahıl ambarı, boksit yatağı", x: 45, y: 62 },
+            { name: "Karaman", region: "İç Anadolu", big: false, kpss: "Bisküvi ve gıda sanayi, elma üretimi", x: 46, y: 70 },
+            { name: "Aksaray", region: "İç Anadolu", big: false, kpss: "Tuz Gölü çevresi, tarım ve hayvancılık", x: 49, y: 57 },
+            { name: "Niğde", region: "İç Anadolu", big: false, kpss: "Patates üretimi, Melendiz dağı, Ömer Halisdemir", x: 52, y: 62 },
+            { name: "Nevşehir", region: "İç Anadolu", big: false, kpss: "Kapadokya peri bacaları, patates ve turizm", x: 51, y: 53 },
+            { name: "Kırşehir", region: "İç Anadolu", big: false, kpss: "Linyit kömürü, Ahilik kültürü merkezi", x: 47, y: 45 },
+            { name: "Kırıkkale", region: "İç Anadolu", big: false, kpss: "MKE savunma sanayi fabrikaları, kavşok nokta", x: 44, y: 41 },
+            { name: "Çankırı", region: "İç Anadolu", big: false, kpss: "Kaya tuzu mağaraları", x: 43, y: 34 },
+            { name: "Yozgat", region: "İç Anadolu", big: false, kpss: "Mercimek üretimi, linyit yatakları", x: 53, y: 43 },
+            { name: "Sivas", region: "İç Anadolu", big: false, kpss: "Yüzölçümü geniş, demir yatakları (Divriği), Kangal", x: 63, y: 39 },
+            { name: "Kayseri", region: "İç Anadolu", big: true, kpss: "Erciyes dağı, mobilya ve halı sanayi, ticaret", x: 55, y: 51 },
+
+            // Akdeniz
+            { name: "Antalya", region: "Akdeniz", big: true, kpss: "Turizm başkenti, seracılık ve narenciye", x: 32, y: 78 },
+            { name: "Isparta", region: "Akdeniz", big: false, kpss: "Gül ve gül suyu üretimi, elma diyarı", x: 35, y: 67 },
+            { name: "Burdur", region: "Akdeniz", big: false, kpss: "Göller yöresi, Salda Gölü (Mars yüzeyine benzer)", x: 30, y: 70 },
+            { name: "Mersin", region: "Akdeniz", big: true, kpss: "Önemli liman, narenciye, Akkuyu Nükleer Santrali", x: 47, y: 80 },
+            { name: "Adana", region: "Akdeniz", big: true, kpss: "Çukurova, pamuk, mısır, tekstil sanayi merkezi", x: 51, y: 74 },
+            { name: "Osmaniye", region: "Akdeniz", big: false, kpss: "Yer fıstığı üretim merkezi", x: 56, y: 71 },
+            { name: "Kahramanmaraş", region: "Akdeniz", big: true, kpss: "Dondurma, pamuk, tekstil, alüminyum tesisi", x: 58, y: 66 },
+            { name: "Hatay", region: "Akdeniz", big: true, kpss: "İskenderun limanı, demir-çelik sanayi, zeytin", x: 56, y: 84 },
+
+            // Karadeniz
+            { name: "Bolu", region: "Karadeniz", big: false, kpss: "Köroğlu dağları, ormancılık, Abant gölü, tabiat", x: 31, y: 31 },
+            { name: "Düzce", region: "Karadeniz", big: false, kpss: "Fındık, orman ürünleri, en genç illerden biri", x: 27, y: 28 },
+            { name: "Zonguldak", region: "Karadeniz", big: false, kpss: "Taşkömürü havzası, Ereğli Demir-Çelik", x: 31, y: 24 },
+            { name: "Bartın", region: "Karadeniz", big: false, kpss: "Amasra limanı, ormancılık", x: 34, y: 23 },
+            { name: "Karabük", region: "Karadeniz", big: false, kpss: "KARDEMİR demir-çelik fabrikası, Safranbolu evleri", x: 37, y: 27 },
+            { name: "Kastamonu", region: "Karadeniz", big: false, kpss: "İnebolu limanı, sarımsak, Küre bakır yatağı", x: 43, y: 25 },
+            { name: "Sinop", region: "Karadeniz", big: false, kpss: "En kuzey nokta (İnceburun), doğal liman", x: 49, y: 22 },
+            { name: "Samsun", region: "Karadeniz", big: true, kpss: "Orta Karadeniz limanı, Bafra ve Çarşamba deltaları", x: 54, y: 27 },
+            { name: "Amasya", region: "Karadeniz", big: false, kpss: "Elma üretimi, Yeşilırmak vadisi tarihi doku", x: 57, y: 32 },
+            { name: "Tokat", region: "Karadeniz", big: false, kpss: "Kazova tarım, tütün ve bağcılık", x: 62, y: 32 },
+            { name: "Çorum", region: "Karadeniz", big: false, kpss: "Leblebi, Hattuşaş (Hitit başkenti)", x: 48, y: 35 },
+            { name: "Ordu", region: "Karadeniz", big: true, kpss: "Fındık üretiminde lider, kivi", x: 66, y: 30 },
+            { name: "Giresun", region: "Karadeniz", big: false, kpss: "Fındık, çay tarımı başlangıcı", x: 71, y: 28 },
+            { name: "Trabzon", region: "Karadeniz", big: true, kpss: "Doğu Karadeniz ticaret limanı, Sümela Manastırı", x: 79, y: 28 },
+            { name: "Rize", region: "Karadeniz", big: false, kpss: "Çay tarımı ve işleme merkezi, Anzer balı", x: 84, y: 28 },
+            { name: "Artvin", region: "Karadeniz", big: false, kpss: "Barajlar (Deriner), Yusufeli, endemik bitkiler", x: 89, y: 25 },
+            { name: "Gümüşhane", region: "Karadeniz", big: false, kpss: "Pestil, köme, gümüş ve kurşun madenleri", x: 75, y: 36 },
+            { name: "Bayburt", region: "Karadeniz", big: false, kpss: "En az nüfuslu illerden, tarım ve arıcılık", x: 81, y: 34 },
+
+            // Doğu Anadolu
+            { name: "Erzurum", region: "Doğu Anadolu", big: true, kpss: "Palandöken kış turizmi, büyükbaş hayvancılık, Oltu taşı", x: 84.5, y: 35 },
+            { name: "Erzincan", region: "Doğu Anadolu", big: false, kpss: "Karasu vadisi, tulum peyniri, deprem kuşağı", x: 74, y: 42 },
+            { name: "Kars", region: "Doğu Anadolu", big: false, kpss: "Ani Harabeleri, sert iklim, büyükbaş meraları, gravyer", x: 94, y: 27 },
+            { name: "Ardahan", region: "Doğu Anadolu", big: false, kpss: "En soğuk illerden, mera hayvancılığı, Gürcistan sınır", x: 93, y: 22 },
+            { name: "Iğdır", region: "Doğu Anadolu", big: false, kpss: "Mikroklima (Pamuk ve meyve yetişir), Ağrı Dağı eteği", x: 98, y: 31 },
+            { name: "Ağrı", region: "Doğu Anadolu", big: false, kpss: "İshak Paşa Sarayı, Türkiye'nin en yüksek dağı", x: 92, y: 38 },
+            { name: "Van", region: "Doğu Anadolu", big: true, kpss: "Türkiye'nin en büyük gölü, Van kedisi, turizm", x: 93, y: 60 },
+            { name: "Muş", region: "Doğu Anadolu", big: false, kpss: "Muş Ovası, lale üretimi, tarım", x: 84, y: 54 },
+            { name: "Bitlis", region: "Doğu Anadolu", big: false, kpss: "Nemrut krater gölü, tütün ve ceviz", x: 89, y: 55 },
+            { name: "Hakkari", region: "Doğu Anadolu", big: false, kpss: "En dağlık/engebeli il, madencilik, Cilo dağları", x: 93, y: 73 },
+            { name: "Bingöl", region: "Doğu Anadolu", big: false, kpss: "Termal kaynaklar, dağlık yapı, arıcılık", x: 79, y: 48 },
+            { name: "Tunceli", region: "Doğu Anadolu", big: false, kpss: "Munzur vadisi, en az nüfus yoğunluğu", x: 73, y: 45 },
+            { name: "Elazığ", region: "Doğu Anadolu", big: false, kpss: "Keban Barajı, hidroelektrik, mermer ve öküzgözü üzüm", x: 71, y: 50 },
+            { name: "Malatya", region: "Doğu Anadolu", big: true, kpss: "Kayısı üretim merkezi, kavşak demiryolu", x: 68, y: 56 },
+
+            // Güneydoğu Anadolu
+            { name: "Gaziantep", region: "Güneydoğu Anadolu", big: true, kpss: "Gastronomi, sanayi, halı dokuma ve ticaret merkezi", x: 63, y: 73 },
+            { name: "Kilis", region: "Güneydoğu Anadolu", big: false, kpss: "Zeytin ve zeytinyağı, sınır kenti", x: 59, y: 76 },
+            { name: "Adıyaman", region: "Doğu Anadolu/GD", big: false, kpss: "Nemrut Dağı heykelleri, tütün üretimi", x: 62, y: 62 },
+            { name: "Şanlıurfa", region: "Güneydoğu Anadolu", big: true, kpss: "GAP projesi, pamuk üretimi, Göbeklitepe tarihi", x: 70.5, y: 72 },
+            { name: "Diyarbakır", region: "Güneydoğu Anadolu", big: true, kpss: "Surları, Hevsel bahçeleri, karpuzu, bölge merkezi", x: 75, y: 64 },
+            { name: "Mardin", region: "Güneydoğu Anadolu", big: true, kpss: "Taş evleri, tarihi doku, Mezopotamya ovası manzarası", x: 78, y: 73 },
+            { name: "Batman", region: "Güneydoğu Anadolu", big: false, kpss: "Petrol çıkarma ve rafinerisi (Raman dağı)", x: 82, y: 60 },
+            { name: "Siirt", region: "Güneydoğu Anadolu", big: false, kpss: "Siirt fıstığı (bıttım), zivzik nar", x: 86, y: 63 },
+            { name: "Şırnak", region: "Güneydoğu Anadolu", big: false, kpss: "Habur sınır kapısı, asfaltit yatakları, kömür", x: 88, y: 71 }
         ];
 
         let currentMode = 'learn';
@@ -291,17 +332,17 @@
         function initMap() {
             markersLayer.innerHTML = '';
             
-            bigCities.forEach(city => {
+            allCities.forEach(city => {
                 const marker = document.createElement('div');
-                marker.className = 'city-marker';
+                marker.className = city.big ? 'city-marker big-city' : 'city-marker';
                 marker.style.left = city.x + '%';
                 marker.style.top = city.y + '%';
                 
                 if (currentMode === 'learn') {
-                    marker.classList.remove('test-btn');
                     marker.addEventListener('mouseenter', () => {
-                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong> <span style="font-size:11px; color:#555;">(${city.region})</span><br><span style="font-size:11px; color:#333;">💡 ${city.feat}</span>`;
-                        tooltip.style.left = (city.x + 2) + '%';
+                        const bigText = city.big ? ' <span style="color:var(--sage-green); font-size:11px;">(Büyükşehir)</span>' : '';
+                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong>${bigText} <span style="font-size:11px; color:#666;">[${city.region}]</span><br><span style="font-size:12px; color:#333;">💡 KPSS: ${city.kpss}</span>`;
+                        tooltip.style.left = (city.x + 1.5) + '%';
                         tooltip.style.top = (city.y - 4) + '%';
                         tooltip.style.opacity = '1';
                     });
@@ -310,9 +351,7 @@
                         tooltip.style.opacity = '0';
                     });
                 } else if (currentMode === 'test') {
-                    marker.classList.add('test-btn'); 
-                    marker.style.zIndex = '10'; 
-
+                    marker.classList.add('test-btn');
                     marker.addEventListener('click', (e) => {
                         e.stopPropagation();
                         checkAnswer(city.name, marker);
@@ -331,7 +370,7 @@
             tooltip.style.opacity = '0';
 
             if (mode === 'learn') {
-                statusBar.innerHTML = "Harita üzerinde büyükşehirlerin üzerine gelerek detayları öğrenebilirsin.";
+                statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek KPSS ayırt edici özelliklerini öğrenebilirsin.";
                 statusBar.style.color = "var(--text-dark)";
             } else if (mode === 'test') {
                 startTest();
@@ -340,10 +379,10 @@
         }
 
         function startTest() {
-            const randomIndex = Math.floor(Math.random() * bigCities.length);
-            currentTestCity = bigCities[randomIndex];
+            const randomIndex = Math.floor(Math.random() * allCities.length);
+            currentTestCity = allCities[randomIndex];
             
-            statusBar.innerHTML = `Hedef Büyükşehir: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 ${currentTestCity.feat}</span>`;
+            statusBar.innerHTML = `Hedef İl: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 İpucu: ${currentTestCity.kpss}</span>`;
             statusBar.style.color = "var(--text-dark)";
         }
 
