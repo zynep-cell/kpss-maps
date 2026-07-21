@@ -251,9 +251,9 @@
         .tooltip {
             position: absolute;
             background-color: var(--white);
-            padding: 6px 14px;
+            padding: 8px 14px;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             pointer-events: none;
             opacity: 0;
@@ -272,6 +272,7 @@
             align-items: center;
             width: 100%;
             max-width: 1100px;
+            gap: 15px;
         }
 
         .hint-toggle-btn {
@@ -292,7 +293,6 @@
 
         .hint-image-container {
             display: none;
-            margin-top: 15px;
             width: 100%;
             border: 2px dashed var(--champagne-gold);
             border-radius: 8px;
@@ -305,6 +305,7 @@
             height: auto;
             display: block;
             border-radius: 4px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -314,7 +315,7 @@
         <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
     </div>
 
-    <h1>TÜRKİYE'NİN AKARSULARI</h1>
+    <h1>TÜRKİYE'NİN AKARSULARI VE HAVZALARI</h1>
 
     <div class="controls">
         <button id="btn-learn" class="main-btn active" onclick="setMode('learn')">Öğrenme Modu</button>
@@ -330,51 +331,52 @@
     <div class="setup-panel" id="setup-panel"></div>
 
     <div class="status-bar" id="status-bar">
-        Harita üzerinde gezinerek akarsuları öğrenebilirsin.
+        Harita üzerinde gezinerek akarsuları ve döküldükleri havzaları öğrenebilirsin.
     </div>
 
     <div class="map-container" id="map-container" onclick="handleMapClick(event)">
-        <img id="map-image" src="akarsu_bos.png.jpeg" alt="Türkiye Akarsular Haritası">
+        <img id="map-image" src="akarsu bos.png (2).jpeg" alt="Türkiye Akarsular Haritası">
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
     <div class="hint-section">
-        <button class="hint-toggle-btn" onclick="toggleHint()">Dolu Haritayı (Kopya) Aç / Kapat</button>
+        <button class="hint-toggle-btn" onclick="toggleHint()">Güncel Kopya Haritalarını Aç / Kapat</button>
         <div class="hint-image-container" id="hint-container">
-            <img src="akarsu_dolu.png.jpeg" alt="Türkiye Akarsular Dolu Haritası">
+            <p style="font-size: 13px; color: var(--champagne-gold); margin-bottom: 5px; text-align: center;">1. Bölüm: Kuzey ve Doğu Akarsuları</p>
+            <img src="akarsu yeni 1_dolu.png.jpeg" alt="Akarsular 1">
+            <p style="font-size: 13px; color: var(--champagne-gold); margin-bottom: 5px; text-align: center; margin-top: 15px;">2. Bölüm: Batı ve Güney Akarsuları (Sınır/Dışa Açılanlar)</p>
+            <img src="akarsu yeni 2_dolu.png.jpeg" alt="Akarsular 2">
+            <p style="font-size: 13px; color: var(--champagne-gold); margin-bottom: 5px; text-align: center; margin-top: 15px;">3. Bölüm: Açık ve Kapalı Havzalar Özeti</p>
+            <img src="akarsu yeni 3_dolu.png.jpeg" alt="Akarsular 3 - Havzalar">
         </div>
     </div>
 
     <script>
         const rivers = [
-            { id: 'ak_1', name: "Meriç", num: 1 },
-            { id: 'ak_2', name: "Susurluk", num: 2 },
-            { id: 'ak_3', name: "Bakırçay", num: 3 },
-            { id: 'ak_4', name: "Gediz", num: 4 },
-            { id: 'ak_5', name: "Küçük Menderes", num: 5 },
-            { id: 'ak_6', name: "Büyük Menderes", num: 6 },
-            { id: 'ak_7', name: "Dalaman", num: 7 },
-            { id: 'ak_8', name: "Eşen", num: 8 },
-            { id: 'ak_9', name: "Aksu", num: 9 },
-            { id: 'ak_10', name: "Köprüçay", num: 10 },
-            { id: 'ak_11', name: "Manavgat", num: 11 },
-            { id: 'ak_12', name: "Göksu", num: 12 },
-            { id: 'ak_13', name: "Seyhan", num: 13 },
-            { id: 'ak_14', name: "Ceyhan", num: 14 },
-            { id: 'ak_15', name: "Asi", num: 15 },
-            { id: 'ak_16', name: "Fırat", num: 16 },
-            { id: 'ak_17', name: "Dicle", num: 17 },
-            { id: 'ak_18', name: "Aras", num: 18 },
-            { id: 'ak_19', name: "Kura", num: 19 },
-            { id: 'ak_20', name: "Çoruh", num: 20 },
-            { id: 'ak_21', name: "Yeşilırmak", num: 21 },
-            { id: 'ak_22', name: "Kızılırmak", num: 22 },
-            { id: 'ak_23', name: "Filyos", num: 23 },
-            { id: 'ak_24', name: "Sakarya", num: 24 }
+            { id: 'ak_1', name: "Meriç", info: "Bulgaristan'dan doğar, Yunanistan sınırını oluşturur, Ege Denizi'ne dökülür (Açık Havza)", num: 1 },
+            { id: 'ak_2', name: "Bakırçay", info: "Balıkesir'den doğar, Ege Denizi'ne dökülür (Açık Havza)", num: 2 },
+            { id: 'ak_3', name: "Gediz", info: "Kütahya'dan doğar, Ege Denizi'ne dökülür (Açık Havza)", num: 3 },
+            { id: 'ak_4', name: "Küçük Menderes", info: "Bozdağlar'dan doğar, Ege Denizi'ne dökülür (Açık Havza)", num: 4 },
+            { id: 'ak_5', name: "Büyük Menderes", info: "Afyon Dinar'dan doğar, Ege Denizi'ne dökülür (Açık Havza)", num: 5 },
+            { id: 'ak_6', name: "Göksu", info: "Toroslar'dan doğar, Akdeniz'e dökülür (Açık Havza)", num: 6 },
+            { id: 'ak_7', name: "Seyhan", info: "Kayseri'den doğar, Çukurova ile Akdeniz'e dökülür (Açık Havza)", num: 7 },
+            { id: 'ak_8', name: "Ceyhan", info: "Kahramanmaraş'tan doğar, Akdeniz'e dökülür (Açık Havza)", num: 8 },
+            { id: 'ak_9', name: "Asi", info: "Lübnan'dan doğar, Suriye'den geçerek Türkiye'ye (Hatay) girer, Akdeniz'e dökülür (Açık Havza)", num: 9 },
+            { id: 'ak_10', name: "Fırat", info: "Türkiye'den doğar (Karasu-Murat), Suriye ve Irak'a geçerek Dicle ile birleşip Basra Körfezi'ne dökülür (Açık Havza)", num: 10 },
+            { id: 'ak_11', name: "Dicle", info: "Türkiye'den doğar, Irak'a geçerek Fırat'la birleşip Basra Körfezi'ne dökülür (Açık Havza)", num: 11 },
+            { id: 'ak_12', name: "Aras", info: "Erzurum'dan doğar, Kura Nehri ile birleşerek Hazar Denizi'ne dökülür (Kapalı Havza)", num: 12 },
+            { id: 'ak_13', name: "Kura", info: "Ardahan'dan doğar, Gürcistan üzerinden Aras ile birleşip Hazar Denizi'ne dökülür (Kapalı Havza)", num: 13 },
+            { id: 'ak_14', name: "Çoruh", info: "Bayburt'tan doğar, Artvin'den Gürcistan'a geçerek Karadeniz'e dökülür (Açık Havza)", num: 14 },
+            { id: 'ak_15', name: "Yeşilırmak", info: "Samsun Çarşamba'da delta oluşturarak Karadeniz'e dökülür (Açık Havza)", num: 15 },
+            { id: 'ak_16', name: "Kızılırmak", info: "Sivas'tan doğar, Bafra Deltası ile Karadeniz'e dökülür - Türkiye'nin en uzun akarsuyu (Açık Havza)", num: 16 },
+            { id: 'ak_17', name: "Filyos (Yenice)", info: "İç Anadolu'dan doğup Karadeniz'e dökülür (Açık Havza)", num: 17 },
+            { id: 'ak_18', name: "Sakarya", info: "Eskişehir'den doğar, Adapazarı üzerinden Karadeniz'e dökülür (Açık Havza)", num: 18 },
+            { id: 'ak_19', name: "Susurluk", info: "Marmara Denizi'ne dökülür (Açık Havza)", num: 19 },
+            { id: 'ak_20', name: "Zap Suyu", info: "Hakkari yöresinden doğup Irak'a giderek Dicle'ye kollar olur (Açık Havza)", num: 20 }
         ];
 
-        let savedCoords = JSON.parse(localStorage.getItem('akarsuCoordsCoreZen')) || {};
+        let savedCoords = JSON.parse(localStorage.getItem('akarsuNewCoordsCoreZen')) || {};
         let currentMode = 'learn';
         let currentTestRiver = null;
         let activeSetupRiverId = null;
@@ -414,7 +416,7 @@
                     marker.classList.remove('test-btn');
 
                     marker.addEventListener('mouseenter', () => {
-                        tooltip.innerHTML = `<span style="color:var(--champagne-gold)">Akarsu No: ${river.num}</span><br>${river.name}`;
+                        tooltip.innerHTML = `<span style="color:var(--champagne-gold)">Akarsu No: ${river.num}</span><br><strong>${river.name}</strong><br><span style="font-size:11px; color:#555;">${river.info}</span>`;
                         tooltip.style.left = (savedCoords[river.id].x + 1.5) + '%';
                         tooltip.style.top = (savedCoords[river.id].y - 3) + '%';
                         tooltip.style.opacity = '1';
@@ -499,7 +501,7 @@
                 mapContainer.classList.remove('setup-active');
                 statusBar.innerHTML = Object.keys(savedCoords).length === 0 
                     ? "Önce <strong>Yer Belirleme</strong> moduna girerek akarsuların konumlarını işaretlemelisin." 
-                    : "Harita üzerinde gezinerek akarsuları öğrenebilirsin.";
+                    : "Harita üzerinde gezinerek akarsuları ve havzaları öğrenebilirsin.";
                 statusBar.style.color = "var(--text-dark)";
             } else if (mode === 'test') {
                 mapContainer.classList.remove('setup-active');
@@ -528,7 +530,7 @@
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
             savedCoords[activeSetupRiverId] = { x: x, y: y };
-            localStorage.setItem('akarsuCoordsCoreZen', JSON.stringify(savedCoords));
+            localStorage.setItem('akarsuNewCoordsCoreZen', JSON.stringify(savedCoords));
             
             activeSetupRiverId = findNextUnmarked();
             
@@ -540,7 +542,7 @@
         function clearSelected() {
             if (activeSetupRiverId && savedCoords[activeSetupRiverId]) {
                 delete savedCoords[activeSetupRiverId];
-                localStorage.setItem('akarsuCoordsCoreZen', JSON.stringify(savedCoords));
+                localStorage.setItem('akarsuNewCoordsCoreZen', JSON.stringify(savedCoords));
                 renderSetupPanel();
                 updateSetupStatus();
                 initMap();
@@ -550,7 +552,7 @@
         function resetAll() {
             if (confirm("Haritadaki tüm kayıtlı yerleri silip en baştan başlamak istediğine emin misin?")) {
                 savedCoords = {};
-                localStorage.removeItem('akarsuCoordsCoreZen');
+                localStorage.removeItem('akarsuNewCoordsCoreZen');
                 activeSetupRiverId = rivers[0].id;
                 renderSetupPanel();
                 updateSetupStatus();
@@ -561,19 +563,15 @@
         function startTest() {
             const markedRivers = rivers.filter(r => savedCoords[r.id]);
             const randomIndex = Math.floor(Math.random() * markedRivers.length);
-            currentTestRiver = markedRivers[randomIndex].name;
+            currentTestRiver = markedRivers[randomIndex];
             
-            statusBar.innerHTML = `Hedef: <strong style="color: var(--champagne-gold); font-size: 22px; margin: 0 8px;">${currentTestRiver}</strong> nerede?`;
+            statusBar.innerHTML = `Hedef: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestRiver.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">(${currentTestRiver.info})</span>`;
             statusBar.style.color = "var(--text-dark)";
         }
 
-        (function() {
-            // Test mode check answer helper
-        })();
-
-        function checkAnswer(clickedRiver, marker) {
-            if (clickedRiver === currentTestRiver) {
-                statusBar.textContent = `Doğru! Orası ${currentTestRiver}.`;
+        function checkAnswer(clickedRiverName, marker) {
+            if (clickedRiverName === currentTestRiver.name) {
+                statusBar.textContent = `Doğru! Orası ${currentTestRiver.name} (${currentTestRiver.info}).`;
                 statusBar.style.color = "var(--sage-green)";
                 marker.style.backgroundColor = "var(--sage-green)";
                 marker.style.borderColor = "var(--sage-green)";
@@ -582,9 +580,9 @@
                     marker.style.backgroundColor = "transparent";
                     marker.style.borderColor = "transparent";
                     startTest();
-                }, 1500);
+                }, 2000);
             } else {
-                statusBar.textContent = `Yanlış yer. Orası ${clickedRiver}. Tekrar dene!`;
+                statusBar.textContent = `Yanlış yer. Orası ${clickedRiverName}. Tekrar dene!`;
                 statusBar.style.color = "var(--pastel-pink)";
             }
         }
