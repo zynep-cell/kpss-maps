@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Zen - Türkiye'nin Tüm İlleri ve Büyükşehirleri</title>
+    <title>Core Zen - Türkiye'nin İlleri ve Fonksiyonel Analiz</title>
     <style>
         :root {
             --bg-cream: #fcfbf9;
@@ -137,8 +137,17 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             overflow: hidden;
             border: 1px solid #eae6df;
-            background-image: linear-gradient(rgba(200,179,130,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200,179,130,0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
+        }
+
+        /* SVG Türkiye Silüet Arka Planı */
+        .turkey-svg-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.18;
+            pointer-events: none;
         }
 
         #markers-layer {
@@ -203,10 +212,10 @@
         <a href="index.html" class="back-btn">← Ana Menüye Dön</a>
     </div>
 
-    <h1>TÜRKİYE'NİN İLLERİ VE KPSS BİLGİ MERKEZİ</h1>
+    <h1>TÜRKİYE'NİN İLLERİ VE FONKSİYONEL ANALİZİ</h1>
 
     <div class="info-box">
-        <p>📌 <strong>Modül Bilgisi:</strong> Türkiye'nin 81 ilinin tamamı yer almaktadır. <span style="color: var(--sage-green); font-weight: bold;">Yeşil noktalar büyükşehirleri</span>, <span style="color: var(--champagne-gold); font-weight: bold;">gold noktalar diğer illeri</span> simgeler. KPSS'de soru potansiyeli olan ayırt edici özellikleri inceleyebilirsin.</p>
+        <p>📌 <strong>Modül Bilgisi:</strong> Türkiye'nin 81 ilinin tamamı; <span style="color: var(--sage-green); font-weight: bold;">Büyükşehirler</span> ve <span style="color: var(--champagne-gold); font-weight: bold;">Diğer İller</span> olarak ayrılmıştır. Sınavda çıkan <strong>Turizm, Ulaşım, Tarım, Sanayi, Liman</strong> fonksiyonları ile küresel örnekler (Londra, Los Angeles vb.) eklenmiştir.</p>
     </div>
 
     <div class="controls">
@@ -215,111 +224,115 @@
     </div>
 
     <div class="status-bar" id="status-bar">
-        Harita üzerinde illerin üzerine gelerek KPSS özelliklerini görebilirsin.
+        Harita üzerinde illerin üzerine gelerek fonksiyonel özellikleri ve KPSS detaylarını görebilirsin.
     </div>
 
     <div class="map-container" id="map-container">
+        <!-- Vektörel Türkiye Haritası Kroki Katmanı -->
+        <svg class="turkey-svg-bg" viewBox="0 0 1000 500" preserveAspectRatio="none">
+            <path d="M50,120 Q120,90 200,110 T400,100 T600,90 T800,110 Q950,120 960,180 Q970,250 900,320 Q800,380 700,360 Q600,400 500,420 Q400,390 300,380 Q200,350 120,300 Q60,250 50,120 Z" fill="#c8b382" />
+        </svg>
         <div id="markers-layer"></div>
         <div id="tooltip" class="tooltip"></div>
     </div>
 
     <script>
-        // Türkiye'nin 81 İli - Koordinatları ve KPSS'ye Yönelik Ayırt Edici Özellikleri
+        // Türkiye'nin 81 İli - Fonksiyonel Sınıflandırma ve KPSS Detayları
         const allCities = [
             // Marmara
-            { name: "İstanbul", region: "Marmara", big: true, kpss: "Nüfus, ticaret, finans ve turizm merkezi; iki yaka", x: 18, y: 24 },
-            { name: "Edirne", region: "Marmara", big: false, kpss: "Sınır kapısı (Kapıkule), Selimiye Camii", x: 7, y: 19 },
-            { name: "Kırklareli", region: "Marmara", big: false, kpss: "Istranca (Yıldız) Dağları,çoğunlukla meşe ormanları", x: 10, y: 15 },
-            { name: "Tekirdağ", region: "Marmara", big: true, kpss: "Trakya'nın liman ve yoğun sanayi kenti", x: 12, y: 25 },
-            { name: "Çanakkale", region: "Marmara", big: false, kpss: "Boğazlar, Kaz Dağı, turizm ve zeytincilik", x: 10, y: 35 },
-            { name: "Balıkesir", region: "Marmara", big: true, kpss: "Zeytin, zeytinyağı, kaplıcalar ve iki denize kıyı", x: 16, y: 34 },
-            { name: "Bursa", region: "Marmara", big: true, kpss: "Otomotiv sanayi, kestane şekeri, Uludağ", x: 23, y: 35 },
-            { name: "Yalova", region: "Marmara", big: false, kpss: "En küçük yüzölçümlü il, süs bitkiciliği", x: 23, y: 29 },
-            { name: "Kocaeli", region: "Marmara", big: true, kpss: "Türkiye'nin sanayi kalbi, petrokimya (İzmit)", x: 25.5, y: 27 },
-            { name: "Sakarya", region: "Marmara", big: true, kpss: "Adapazarı Ovası, mobilya ve otomotiv sanayi", x: 29, y: 28 },
-            { name: "Bilecik", region: "Marmara", big: false, kpss: "Seramik ve mermer üretimi, tarihi geçit noktası", x: 30, y: 35 },
+            { name: "İstanbul", region: "Marmara", big: true, func: "Liman, Sanayi, Ticaret, Turizm", kpss: "Finans, idari ve küresel liman merkezi (Londra benzeri finans kenti)." },
+            { name: "Edirne", region: "Marmara", big: false, func: "Ulaşım / Sınır", kpss: "Kapıkule sınır kapısı ile Avrupa'ya açılan ana kara ulaşım kapısı." },
+            { name: "Kırklareli", region: "Marmara", big: false, func: "Ormancılık", kpss: "Istranca Dağları, meşe ormanları ve longoz ormanları ekosistemi." },
+            { name: "Tekirdağ", region: "Marmara", big: true, func: "Liman / Sanayi", kpss: "Trakya'nın dış ticarette aktif limanı ve yoğun sanayi bölgesi." },
+            { name: "Çanakkale", region: "Marmara", big: false, func: "Turizm / Ulaşım", kpss: "Boğazlar geçiş noktası, Truva ve turizm merkezi." },
+            { name: "Balıkesir", region: "Marmara", big: true, func: "Tarım / Turizm", kpss: "İki denize kıyısı; zeytin, zeytinyağı ve termal turizm." },
+            { name: "Bursa", region: "Marmara", big: true, func: "Sanayi / Turizm", kpss: "Otomotiv sanayi başkenti, tekstil ve Uludağ kış turizmi." },
+            { name: "Yalova", region: "Marmara", big: false, func: "Turizm / Tarım", kpss: "Termal kaplıcalar ve süs bitkiciliği / seracılık merkezi." },
+            { name: "Kocaeli", region: "Marmara", big: true, func: "Liman / Sanayi", kpss: "Türkiye'nin petrokimya ve ağır sanayi kalbi (İzmit Körfezi limanları)." },
+            { name: "Sakarya", region: "Marmara", big: true, func: "Sanayi / Tarım", kpss: "Adapazarı Ovası tarımı ve demiryolu/karayolu kavşak sanayisi." },
+            { name: "Bilecik", region: "Marmara", big: false, func: "Sanayi", kpss: "Seramik, vitrifiye ve mermer üretim üssü." },
 
             // Ege
-            { name: "İzmir", region: "Ege", big: true, kpss: "Ege'nin en büyük limanı, ihraç limanı, turizm", x: 12.5, y: 56 },
-            { name: "Manisa", region: "Ege", big: true, kpss: "Gediz Ovası, üzüm, tütün ve Vestel üssü", x: 16, y: 48 },
-            { name: "Aydın", region: "Ege", big: true, kpss: "İncir, zeytin, jeotermal enerji potansiyeli", x: 15.5, y: 67 },
-            { name: "Muğla", region: "Ege", big: true, kpss: "En çok koy/körfeze sahip, turizm, mermer ve çam balı", x: 19.5, y: 78 },
-            { name: "Denizli", region: "Ege", big: true, kpss: "Pamukkale travertenleri, tekstil ve mermercilik", x: 23.5, y: 68 },
-            { name: "Uşak", region: "Ege", big: false, kpss: "Halıcılık ve battaniye üretimi, ilk şeker fabrikası", x: 23, y: 52 },
-            { name: "Kütahya", region: "Ege", big: false, kpss: "Porselen, çini ve linyit (termik santral) yatakları", x: 27, y: 43 },
-            { name: "Afyonkarahisar", region: "Ege", big: false, kpss: "Kavşak noktası, termal turizm, haşhaş ve mermer", x: 32, y: 53 },
+            { name: "İzmir", region: "Ege", big: true, func: "Liman / Ticaret / Turizm", kpss: "Ege'nin ihraç limanı, fuar ve ticaret kenti (Los Angeles benzeri kıyı metropolü)." },
+            { name: "Manisa", region: "Ege", big: true, func: "Tarım / Sanayi", kpss: "Gediz Ovası çekirdeksiz kuru üzüm, tütün ve beyaz eşya sanayi." },
+            { name: "Aydın", region: "Ege", big: true, func: "Tarım / Enerji", kpss: "İncir, zeytin üretim merkezi ve jeotermal enerji potansiyeli." },
+            { name: "Muğla", region: "Marmara/Ege", big: true, func: "Turizm", kpss: "En çok koy/körfeze sahip, yaz turizmi ve çam balı üretim merkezi." },
+            { name: "Denizli", region: "Ege", big: true, func: "Sanayi / Turizm", kpss: "Pamukkale travertenleri, havlu/bornoz tekstili ve mermercilik." },
+            { name: "Uşak", region: "Ege", big: false, func: "Sanayi", kpss: "Halıcılık, battaniye üretimi ve ilk şeker fabrikası tarihi." },
+            { name: "Kütahya", region: "Ege", big: false, func: "Sanayi / Maden", kpss: "Porselen, çini el sanatları ve linyit yataklı termik santraller." },
+            { name: "Afyonkarahisar", region: "Ege", big: false, func: "Ulaşım / Tarım", kpss: "Demiryolu ve karayollarının kesiştiği kavşak, haşhaş ve termal turizm." },
 
             // İç Anadolu
-            { name: "Ankara", region: "İç Anadolu", big: true, kpss: "Başkent, idari merkez, demiryolu kavşağı", x: 42, y: 45 },
-            { name: "Eskişehir", region: "Ege/İç Anadolu", big: true, kpss: "Lületaşı, havacılık sanayi, öğrenci kenti", x: 34, y: 40 },
-            { name: "Konya", region: "İç Anadolu", big: true, kpss: "Yüzölçümü en büyük, tahıl ambarı, boksit yatağı", x: 45, y: 62 },
-            { name: "Karaman", region: "İç Anadolu", big: false, kpss: "Bisküvi ve gıda sanayi, elma üretimi", x: 46, y: 70 },
-            { name: "Aksaray", region: "İç Anadolu", big: false, kpss: "Tuz Gölü çevresi, tarım ve hayvancılık", x: 49, y: 57 },
-            { name: "Niğde", region: "İç Anadolu", big: false, kpss: "Patates üretimi, Melendiz dağı, Ömer Halisdemir", x: 52, y: 62 },
-            { name: "Nevşehir", region: "İç Anadolu", big: false, kpss: "Kapadokya peri bacaları, patates ve turizm", x: 51, y: 53 },
-            { name: "Kırşehir", region: "İç Anadolu", big: false, kpss: "Linyit kömürü, Ahilik kültürü merkezi", x: 47, y: 45 },
-            { name: "Kırıkkale", region: "İç Anadolu", big: false, kpss: "MKE savunma sanayi fabrikaları, kavşok nokta", x: 44, y: 41 },
-            { name: "Çankırı", region: "İç Anadolu", big: false, kpss: "Kaya tuzu mağaraları", x: 43, y: 34 },
-            { name: "Yozgat", region: "İç Anadolu", big: false, kpss: "Mercimek üretimi, linyit yatakları", x: 53, y: 43 },
-            { name: "Sivas", region: "İç Anadolu", big: false, kpss: "Yüzölçümü geniş, demir yatakları (Divriği), Kangal", x: 63, y: 39 },
-            { name: "Kayseri", region: "İç Anadolu", big: true, kpss: "Erciyes dağı, mobilya ve halı sanayi, ticaret", x: 55, y: 51 },
+            { name: "Ankara", region: "İç Anadolu", big: true, func: "Ulaşım / İdari", kpss: "Ülkenin idari başkenti ve demiryolu/karayolu ana kavşak merkezi." },
+            { name: "Eskişehir", region: "İç Anadolu", big: true, func: "Sanayi / Ulaşım", kpss: "Lületaşı, havacılık sanayi, yüksek hızlı tren (YHT) merkezi." },
+            { name: "Konya", region: "İç Anadolu", big: true, func: "Tarım", kpss: "Türkiye'nin tahıl ambarı, yüzölçümü en büyük il, boksit madeni." },
+            { name: "Karaman", region: "İç Anadolu", big: false, func: "Tarım / Sanayi", kpss: "Bisküvi ve unlu mamuller gıda sanayi, elma üretimi." },
+            { name: "Aksaray", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Tuz Gölü havzası çevresinde tahıl ve hayvancılık faaliyetleri." },
+            { name: "Niğde", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Patates ve lahana üretiminde Türkiye'nin önde gelen merkezi." },
+            { name: "Nevşehir", region: "İç Anadolu", big: false, func: "Turizm / Tarım", kpss: "Kapadokya peri bacaları, yer altı şehirleri ve patates depoculuğu." },
+            { name: "Kırşehir", region: "İç Anadolu", big: false, func: "Kültür / Maden", kpss: "Linyit yatakları ve Ahilik kültürü merkezi." },
+            { name: "Kırıkkale", region: "İç Anadolu", big: false, func: "Sanayi / Ulaşım", kpss: "MKE savunma sanayi fabrikaları ve Doğu'ya açılan kavşak." },
+            { name: "Çankırı", region: "İç Anadolu", big: false, func: "Maden", kpss: "Kaya tuzu rezervleri ve yeraltı tuz mağaraları." },
+            { name: "Yozgat", region: "İç Anadolu", big: false, func: "Tarım", kpss: "Kuru tarım, mercimek üretimi ve linyit ocakları." },
+            { name: "Sivas", region: "İç Anadolu", big: false, func: "Maden / Ulaşım", kpss: "Divriği demir madeni yatakları, geniş yüzölçümü ve demiryolu ağı." },
+            { name: "Kayseri", region: "İç Anadolu", big: true, func: "Sanayi / Ticaret", kpss: "Erciyes eteklerinde mobilya, halı imalatı ve iç ticaret merkezi." },
 
             // Akdeniz
-            { name: "Antalya", region: "Akdeniz", big: true, kpss: "Turizm başkenti, seracılık ve narenciye", x: 32, y: 78 },
-            { name: "Isparta", region: "Akdeniz", big: false, kpss: "Gül ve gül suyu üretimi, elma diyarı", x: 35, y: 67 },
-            { name: "Burdur", region: "Akdeniz", big: false, kpss: "Göller yöresi, Salda Gölü (Mars yüzeyine benzer)", x: 30, y: 70 },
-            { name: "Mersin", region: "Akdeniz", big: true, kpss: "Önemli liman, narenciye, Akkuyu Nükleer Santrali", x: 47, y: 80 },
-            { name: "Adana", region: "Akdeniz", big: true, kpss: "Çukurova, pamuk, mısır, tekstil sanayi merkezi", x: 51, y: 74 },
-            { name: "Osmaniye", region: "Akdeniz", big: false, kpss: "Yer fıstığı üretim merkezi", x: 56, y: 71 },
-            { name: "Kahramanmaraş", region: "Akdeniz", big: true, kpss: "Dondurma, pamuk, tekstil, alüminyum tesisi", x: 58, y: 66 },
-            { name: "Hatay", region: "Akdeniz", big: true, kpss: "İskenderun limanı, demir-çelik sanayi, zeytin", x: 56, y: 84 },
+            { name: "Antalya", region: "Akdeniz", big: true, func: "Turizm / Tarım", kpss: "Uluslararası turizm başkenti, seracılık ve narenciye cenneti." },
+            { name: "Isparta", region: "Akdeniz", big: false, func: "Tarım / Turizm", kpss: "Dünya gül yağı üretimi merkezi ve elma bahçeleri." },
+            { name: "Burdur", region: "Akdeniz", big: false, func: "Turizm", kpss: "Göller yöresi, Mars yüzeyine benzeyen Salda Gölü." },
+            { name: "Mersin", region: "Akdeniz", big: true, func: "Liman / Ticaret", kpss: "Doğu Akdeniz'in uluslararası ticaret limanı ve narenciye üssü." },
+            { name: "Adana", region: "Akdeniz", big: true, func: "Tarım / Sanayi", kpss: "Çukurova Ovası pamuk/mısır üretimi ve tekstil sanayi." },
+            { name: "Osmaniye", region: "Akdeniz", big: false, func: "Tarım", kpss: "Türkiye yer fıstığı üretiminin başkenti." },
+            { name: "Kahramanmaraş", region: "Akdeniz", big: true, func: "Sanayi", kpss: "Tekstil, pamuk işleme, dondurma ve enerji tesisleri." },
+            { name: "Hatay", region: "Akdeniz", big: true, func: "Liman / Tarım", kpss: "İskenderun limanı, demir-çelik sanayi ve zeytincilik." },
 
             // Karadeniz
-            { name: "Bolu", region: "Karadeniz", big: false, kpss: "Köroğlu dağları, ormancılık, Abant gölü, tabiat", x: 31, y: 31 },
-            { name: "Düzce", region: "Karadeniz", big: false, kpss: "Fındık, orman ürünleri, en genç illerden biri", x: 27, y: 28 },
-            { name: "Zonguldak", region: "Karadeniz", big: false, kpss: "Taşkömürü havzası, Ereğli Demir-Çelik", x: 31, y: 24 },
-            { name: "Bartın", region: "Karadeniz", big: false, kpss: "Amasra limanı, ormancılık", x: 34, y: 23 },
-            { name: "Karabük", region: "Karadeniz", big: false, kpss: "KARDEMİR demir-çelik fabrikası, Safranbolu evleri", x: 37, y: 27 },
-            { name: "Kastamonu", region: "Karadeniz", big: false, kpss: "İnebolu limanı, sarımsak, Küre bakır yatağı", x: 43, y: 25 },
-            { name: "Sinop", region: "Karadeniz", big: false, kpss: "En kuzey nokta (İnceburun), doğal liman", x: 49, y: 22 },
-            { name: "Samsun", region: "Karadeniz", big: true, kpss: "Orta Karadeniz limanı, Bafra ve Çarşamba deltaları", x: 54, y: 27 },
-            { name: "Amasya", region: "Karadeniz", big: false, kpss: "Elma üretimi, Yeşilırmak vadisi tarihi doku", x: 57, y: 32 },
-            { name: "Tokat", region: "Karadeniz", big: false, kpss: "Kazova tarım, tütün ve bağcılık", x: 62, y: 32 },
-            { name: "Çorum", region: "Karadeniz", big: false, kpss: "Leblebi, Hattuşaş (Hitit başkenti)", x: 48, y: 35 },
-            { name: "Ordu", region: "Karadeniz", big: true, kpss: "Fındık üretiminde lider, kivi", x: 66, y: 30 },
-            { name: "Giresun", region: "Karadeniz", big: false, kpss: "Fındık, çay tarımı başlangıcı", x: 71, y: 28 },
-            { name: "Trabzon", region: "Karadeniz", big: true, kpss: "Doğu Karadeniz ticaret limanı, Sümela Manastırı", x: 79, y: 28 },
-            { name: "Rize", region: "Karadeniz", big: false, kpss: "Çay tarımı ve işleme merkezi, Anzer balı", x: 84, y: 28 },
-            { name: "Artvin", region: "Karadeniz", big: false, kpss: "Barajlar (Deriner), Yusufeli, endemik bitkiler", x: 89, y: 25 },
-            { name: "Gümüşhane", region: "Karadeniz", big: false, kpss: "Pestil, köme, gümüş ve kurşun madenleri", x: 75, y: 36 },
-            { name: "Bayburt", region: "Karadeniz", big: false, kpss: "En az nüfuslu illerden, tarım ve arıcılık", x: 81, y: 34 },
+            { name: "Bolu", region: "Karadeniz", big: false, func: "Ulaşım / Turizm", kpss: "Anadolu geçit noktası (Bolu Dağı), ormancılık ve Abant gölü." },
+            { name: "Düzce", region: "Karadeniz", big: false, func: "Tarım / Sanayi", kpss: "Fındık, orman ürünleri ve mobilya sanayi." },
+            { name: "Zonguldak", region: "Karadeniz", big: false, func: "Maden / Sanayi", kpss: "Taşkömürü havzası ve Ereğli Demir-Çelik fabrikası." },
+            { name: "Bartın", region: "Karadeniz", big: false, func: "Liman / Orman", kpss: "Amasra tarihi limanı ve ormancılık ürünleri." },
+            { name: "Karabük", region: "Karadeniz", big: false, func: "Sanayi", kpss: "KARDEMİR ile Türkiye'nin ilk demir-çelik fabrikası kenti." },
+            { name: "Kastamonu", region: "Karadeniz", big: false, func: "Maden / Tarım", kpss: "Küre bakır yatakları, İnebolu limanı ve sarımsak." },
+            { name: "Sinop", region: "Karadeniz", big: false, func: "Liman", kpss: "Türkiye'nin en kuzey ucu ve tek doğal limanı." },
+            { name: "Samsun", region: "Karadeniz", big: true, func: "Liman / Ulaşım", kpss: "Orta Karadeniz'in en büyük limanı ve demiryolu bağlantısı." },
+            { name: "Amasya", region: "Karadeniz", big: false, func: "Tarım / Turizm", kpss: "Yeşilırmak vadisi, elma tarımı ve tarihi evler." },
+            { name: "Tokat", region: "Karadeniz", big: false, func: "Tarım", kpss: "Kazova tarım potansiyeli, tütün ve bağcılık." },
+            { name: "Çorum", region: "Karadeniz", big: false, func: "Tarım / Sanayi", kpss: "Unlu mamuller, leblebi ve Hitit başkenti Hattuşaş." },
+            { name: "Ordu", region: "Karadeniz", big: true, func: "Tarım", kpss: "Fındık üretiminde lider illerden biri." },
+            { name: "Giresun", region: "Karadeniz", big: false, func: "Tarım", kpss: "Fındığın ana vatanı ve doğuya geçiş kıyısı." },
+            { name: "Trabzon", region: "Karadeniz", big: true, func: "Liman / Ticaret", kpss: "Doğu Karadeniz'in uluslararası ticaret ve liman merkezi." },
+            { name: "Rize", region: "Karadeniz", big: false, func: "Tarım", kpss: "Çay tarımı, işleme fabrikaları ve Anzer balı." },
+            { name: "Artvin", region: "Karadeniz", big: false, func: "Enerji / Baraj", kpss: "Çoruh nehri üzerindeki dev barajlar (Deriner, Yusufeli) ve HES'ler." },
+            { name: "Gümüşhane", region: "Karadeniz", big: false, func: "Maden", kpss: "Gümüş, kurşun ve çinko maden yatakları." },
+            { name: "Bayburt", region: "Karadeniz", big: false, func: "Tarım", kpss: "Düşük nüfus yoğunluğu, arıcılık ve tarım." },
 
             // Doğu Anadolu
-            { name: "Erzurum", region: "Doğu Anadolu", big: true, kpss: "Palandöken kış turizmi, büyükbaş hayvancılık, Oltu taşı", x: 84.5, y: 35 },
-            { name: "Erzincan", region: "Doğu Anadolu", big: false, kpss: "Karasu vadisi, tulum peyniri, deprem kuşağı", x: 74, y: 42 },
-            { name: "Kars", region: "Doğu Anadolu", big: false, kpss: "Ani Harabeleri, sert iklim, büyükbaş meraları, gravyer", x: 94, y: 27 },
-            { name: "Ardahan", region: "Doğu Anadolu", big: false, kpss: "En soğuk illerden, mera hayvancılığı, Gürcistan sınır", x: 93, y: 22 },
-            { name: "Iğdır", region: "Doğu Anadolu", big: false, kpss: "Mikroklima (Pamuk ve meyve yetişir), Ağrı Dağı eteği", x: 98, y: 31 },
-            { name: "Ağrı", region: "Doğu Anadolu", big: false, kpss: "İshak Paşa Sarayı, Türkiye'nin en yüksek dağı", x: 92, y: 38 },
-            { name: "Van", region: "Doğu Anadolu", big: true, kpss: "Türkiye'nin en büyük gölü, Van kedisi, turizm", x: 93, y: 60 },
-            { name: "Muş", region: "Doğu Anadolu", big: false, kpss: "Muş Ovası, lale üretimi, tarım", x: 84, y: 54 },
-            { name: "Bitlis", region: "Doğu Anadolu", big: false, kpss: "Nemrut krater gölü, tütün ve ceviz", x: 89, y: 55 },
-            { name: "Hakkari", region: "Doğu Anadolu", big: false, kpss: "En dağlık/engebeli il, madencilik, Cilo dağları", x: 93, y: 73 },
-            { name: "Bingöl", region: "Doğu Anadolu", big: false, kpss: "Termal kaynaklar, dağlık yapı, arıcılık", x: 79, y: 48 },
-            { name: "Tunceli", region: "Doğu Anadolu", big: false, kpss: "Munzur vadisi, en az nüfus yoğunluğu", x: 73, y: 45 },
-            { name: "Elazığ", region: "Doğu Anadolu", big: false, kpss: "Keban Barajı, hidroelektrik, mermer ve öküzgözü üzüm", x: 71, y: 50 },
-            { name: "Malatya", region: "Doğu Anadolu", big: true, kpss: "Kayısı üretim merkezi, kavşak demiryolu", x: 68, y: 56 },
+            { name: "Erzurum", region: "Doğu Anadolu", big: true, func: "Ulaşım / Turizm", kpss: "Doğu'nun ana kavşağı, Palandöken kış turizmi ve büyükbaş meraları." },
+            { name: "Erzincan", region: "Doğu Anadolu", big: false, func: "Tarım / Maden", kpss: "Karasu vadisi, tulum peyniri ve aktif deprem kuşağı." },
+            { name: "Kars", region: "Doğu Anadolu", big: false, func: "Tarım / Turizm", kpss: "Sert karasal iklim, Ani Harabeleri ve büyükbaş mera hayvancılığı." },
+            { name: "Ardahan", region: "Doğu Anadolu", big: false, func: "Ulaşım / Tarım", kpss: "Türkgözü sınır kapısı, en soğuk illerden biri ve mera hayvancılığı." },
+            { name: "Iğdır", region: "Doğu Anadolu", big: false, func: "Tarım", kpss: "Mikroklima alanı sayesinde pamuk ve meyve (kayısı) yetişen çukur alan." },
+            { name: "Ağrı", region: "Doğu Anadolu", big: false, func: "Turizm / Tarım", kpss: "Türkiye'nin en yüksek dağı (Ağrı Dağı) ve İshak Paşa Sarayı." },
+            { name: "Van", region: "Doğu Anadolu", big: true, func: "Turizm / Ulaşım", kpss: "Van Gölü, inci kefali balığı ve Doğu Anadolu'nun turizm merkezi." },
+            { name: "Muş", region: "Doğu Anadolu", big: false, func: "Tarım", kpss: "Muş Ovası tarım potansiyeli ve lale üretimi." },
+            { name: "Bitlis", region: "Doğu Anadolu", big: false, func: "Turizm / Tarım", kpss: "Nemrut krater gölü, tütün ve ceviz üretimi." },
+            { name: "Hakkari", region: "Doğu Anadolu", big: false, func: "Maden", kpss: "En engebeli ve dağlık il, çinko/kurşun madenleri." },
+            { name: "Bingöl", region: "Doğu Anadolu", big: false, func: "Enerji / Arıcılık", kpss: "Termal kaynaklar, dağlık yapı ve bal üretimi." },
+            { name: "Tunceli", region: "Doğu Anadolu", big: false, func: "Turizm", kpss: "Munzur vadisi millî parkı ve en düşük nüfus yoğunluğu." },
+            { name: "Elazığ", region: "Doğu Anadolu", big: false, func: "Enerji / Maden", kpss: "Keban Barajı (HES), mermer rezervleri ve bağcılık." },
+            { name: "Malatya", region: "Doğu Anadolu", big: true, func: "Tarım / Ulaşım", kpss: "Dünya kayısı başkenti ve demiryolu/karayolu kavşak noktası." },
 
             // Güneydoğu Anadolu
-            { name: "Gaziantep", region: "Güneydoğu Anadolu", big: true, kpss: "Gastronomi, sanayi, halı dokuma ve ticaret merkezi", x: 63, y: 73 },
-            { name: "Kilis", region: "Güneydoğu Anadolu", big: false, kpss: "Zeytin ve zeytinyağı, sınır kenti", x: 59, y: 76 },
-            { name: "Adıyaman", region: "Doğu Anadolu/GD", big: false, kpss: "Nemrut Dağı heykelleri, tütün üretimi", x: 62, y: 62 },
-            { name: "Şanlıurfa", region: "Güneydoğu Anadolu", big: true, kpss: "GAP projesi, pamuk üretimi, Göbeklitepe tarihi", x: 70.5, y: 72 },
-            { name: "Diyarbakır", region: "Güneydoğu Anadolu", big: true, kpss: "Surları, Hevsel bahçeleri, karpuzu, bölge merkezi", x: 75, y: 64 },
-            { name: "Mardin", region: "Güneydoğu Anadolu", big: true, kpss: "Taş evleri, tarihi doku, Mezopotamya ovası manzarası", x: 78, y: 73 },
-            { name: "Batman", region: "Güneydoğu Anadolu", big: false, kpss: "Petrol çıkarma ve rafinerisi (Raman dağı)", x: 82, y: 60 },
-            { name: "Siirt", region: "Güneydoğu Anadolu", big: false, kpss: "Siirt fıstığı (bıttım), zivzik nar", x: 86, y: 63 },
-            { name: "Şırnak", region: "Güneydoğu Anadolu", big: false, kpss: "Habur sınır kapısı, asfaltit yatakları, kömür", x: 88, y: 71 }
+            { name: "Gaziantep", region: "Güneydoğu", big: true, func: "Sanayi / Ticaret", kpss: "Güneydoğu'nun sanayi, halı dokuma, ticaret ve gastronomi kenti." },
+            { name: "Kilis", region: "Güneydoğu", big: false, func: "Tarım / Sınır", kpss: "Zeytin, zeytinyağı ve üzüm tarımı ile sınır kapısı kenti." },
+            { name: "Adıyaman", region: "Doğu/GD", big: false, func: "Turizm / Enerji", kpss: "Nemrut Dağı tescilli heykelleri, tütün tarımı ve petrol üretimi." },
+            { name: "Şanlıurfa", region: "Güneydoğu", big: true, func: "Tarım / Enerji", kpss: "GAP projesi ile sulanan tarım alanları, pamuk ve Göbeklitepe." },
+            { name: "Diyarbakır", region: "Güneydoğu", big: true, func: "Ulaşım / Ticaret", kpss: "Bölgenin merkez şehri, surları, Hevsel bahçeleri ve karpuzu." },
+            { name: "Mardin", region: "Güneydoğu", big: true, func: "Turizm", kpss: "Taş mimari evleri, tarihi dokusu ve Mezopotamya ovası manzarası." },
+            { name: "Batman", region: "Güneydoğu", big: false, func: "Enerji / Maden", kpss: "Raman Dağı petrol çıkarma sahası ve petrol rafinerisi." },
+            { name: "Siirt", region: "Güneydoğu", big: false, func: "Tarım", kpss: "Siirt fıstığı (bıttım) üretimi." },
+            { name: "Şırnak", region: "Güneydoğu", big: false, func: "Ulaşım / Maden", kpss: "Habur sınır kapısı (Irak ticaret hattı), asfaltit ve kömür yatakları." }
         ];
 
         let currentMode = 'learn';
@@ -341,7 +354,7 @@
                 if (currentMode === 'learn') {
                     marker.addEventListener('mouseenter', () => {
                         const bigText = city.big ? ' <span style="color:var(--sage-green); font-size:11px;">(Büyükşehir)</span>' : '';
-                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong>${bigText} <span style="font-size:11px; color:#666;">[${city.region}]</span><br><span style="font-size:12px; color:#333;">💡 KPSS: ${city.kpss}</span>`;
+                        tooltip.innerHTML = `<strong style="color:var(--champagne-gold)">${city.name}</strong>${bigText} <span style="font-size:11px; color:#666;">[${city.region}]</span><br><span style="font-size:11px; color:var(--sage-green); font-weight:600;">⚡ Fonksiyon: ${city.func}</span><br><span style="font-size:12px; color:#333;">💡 KPSS: ${city.kpss}</span>`;
                         tooltip.style.left = (city.x + 1.5) + '%';
                         tooltip.style.top = (city.y - 4) + '%';
                         tooltip.style.opacity = '1';
@@ -370,7 +383,7 @@
             tooltip.style.opacity = '0';
 
             if (mode === 'learn') {
-                statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek KPSS ayırt edici özelliklerini öğrenebilirsin.";
+                statusBar.innerHTML = "Harita üzerinde illerin üzerine gelerek fonksiyonel özellikleri ve KPSS detaylarını görebilirsin.";
                 statusBar.style.color = "var(--text-dark)";
             } else if (mode === 'test') {
                 startTest();
@@ -382,7 +395,7 @@
             const randomIndex = Math.floor(Math.random() * allCities.length);
             currentTestCity = allCities[randomIndex];
             
-            statusBar.innerHTML = `Hedef İl: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 İpucu: ${currentTestCity.kpss}</span>`;
+            statusBar.innerHTML = `Hedef İl: <strong style="color: var(--champagne-gold); font-size: 20px; margin: 0 8px;">${currentTestCity.name}</strong> nerede? <span style="font-size:12px; color:#666; display:block;">💡 Fonksiyon: ${currentTestCity.func} | İpucu: ${currentTestCity.kpss}</span>`;
             statusBar.style.color = "var(--text-dark)";
         }
 
