@@ -360,26 +360,26 @@
 
     <script>
         const lakes = [
-            { id: 'l_1', name: "İznik Gölü", type: "Tektonik", feat: "Marmara Bölgesi'nin en büyük gölü, tatlı su", num: 1 },
+            { id: 'l_1', name: "Manyas(Kuş) Gölü", type: "Tektonik", feat: "Kuş cenneti Milli Parkıyla ünlüdür,Ramsar alanı, tatlı su", num: 1 },
             { id: 'l_2', name: "Ulubat Gölü", type: "Tektonik", feat: "Kuş çeşitliliği zengin, Ramsar alanı", num: 2 },
-            { id: 'l_3', name: "Sapanca Gölü", type: "Tektonik / Alüvyal Set", feat: "Tatlı su gölü", num: 3 },
-            { id: 'l_4', name: "Terkos (Durusu) Gölü", type: "Kıyı Set (Lagün)", feat: "İstanbul'un içme suyu kaynağı", num: 4 },
-            { id: 'l_5', name: "Büyükçekmece / Küçükçekmece", type: "Kıyı Set (Lagün)", feat: "Yoğun yerleşim baskısı altında", num: 5 },
+            { id: 'l_3', name: "İznik Gölü", type: "Tektonik", feat: "Marmara'nın en büyük tatlı su gölü", num: 3 },
+            { id: 'l_4', name: "Sapanca Gölü", type: "Tektonik", feat: "turistik tatlı su gölü", num: 4 },
+            { id: 'l_5', name: "Terkos (Durusu) Lagünü", type: "Kıyı Set (Lagün)", feat: "en büyük kıyı set gölü, içme su kaynağı", num: 5 },
             { id: 'l_6', name: "Tuz Gölü", type: "Tektonik", feat: "Türkiye'nin tuz ihtiyacının önemli kaynağı, kapalı havza", num: 6 },
             { id: 'l_7', name: "Eber Gölü", type: "Tektonik", feat: "Tatlı su gölü", num: 7 },
             { id: 'l_8', name: "Akşehir Gölü", type: "Tektonik", feat: "Tektonik kökenli iç Anadolu gölü", num: 8 },
-            { id: 'l_9', name: "Burdur Gölü", type: "Tektonik", feat: "Suları tuzlu-sodalık, Ramsar alanı", num: 9 },
-            { id: 'l_10', name: "Acıgöl", type: "Tektonik", feat: "Sodyum sülfat üretimi yapılan göl", num: 10 },
-            { id: 'l_11', name: "Salda Gölü", type: "Karstik", feat: "Beyaz kumlarıyla 'Türkiye'nin Maldivleri'", num: 11 },
+            { id: 'l_9', name: "Acıgöl Gölü", type: "Tektonik", feat: "Sodyum sülfat üretimi yapılan göl ", num: 9 },
+            { id: 'l_10', name: "Burdur", type: "Tektonik", feat: "Suları tuzlu-sodalık, Ramsar alanı", num: 10 },
+            { id: 'l_11', name: "Kovada Gölü", type: "Karma (Tektonik-Karstik)", feat: "Eğirdir'i fazla suları buraya gelir'", num: 11 },
             { id: 'l_12', name: "Eğirdir Gölü", type: "Karma (Tektonik-Karstik)", feat: "Giderli, fazla suları Kovada'ya ulaşır", num: 12 },
-            { id: 'l_13', name: "Beyşehir Gölü", type: "Karma (Tektonik-Karstik)", feat: "Giderli, Çumra Ovası'nı sular", num: 13 },
+            { id: 'l_13', name: "Beyşehir Gölü", type: "Karma (Tektonik-Karstik)", feat: "Suğlaya Giderli, Çumra Ovası'nı sular", num: 13 },
             { id: 'l_14', name: "Suğla Gölü", type: "Karma (Tektonik-Karstik)", feat: "Yapay gidenli kapalı havza gölü", num: 14 },
-            { id: 'l_15', name: "Meke Gölü", type: "Volkanik (Maar)", feat: "Türkiye'nin 'Dünyanın nazar boncuğu'", num: 15 },
-            { id: 'l_16', name: "Acıgöl (Nevşehir/Konya çevresi)", type: "Volkanik", feat: "Volkanik patlama çukuru gölü", num: 16 },
-            { id: 'l_17', name: "Ölüdeniz", type: "Kıyı Set (Lagün)", feat: "Denizle dar kanal bağlantılı, turizm merkezi", num: 17 },
-            { id: 'l_18', name: "Nazik / Erçek / Balık", type: "Volkanik / Lav Set", feat: "Doğu Anadolu doğal set ve volkanik göller", num: 18 },
+            { id: 'l_15', name: "Acıgöl (Nevşehir/Konya çevresi)", type: "Volkanik", feat: "Volkanik patlama çukuru gölü", num: 15 },
+            { id: 'l_16', name: "Meke Gölü ", type: "Volkanik (Maar)", feat: "Türkiye'nin 'Dünyanın nazar boncuğu'", num: 16 },
+            { id: 'l_17', name: "Yumurtalık Lagünü", type: "Kıyı Set (Lagün)", feat: "Milli parkı var, Ramsar alanı", num: 17 },
+            { id: 'l_18', name: "Nazik Gölü", type: "Volkanik / Lav Set", feat: "Lav set gölü", num: 18 },
             { id: 'l_19', name: "Van Gölü", type: "Karma (Tektonik + Volkanik Set)", feat: "Türkiye'nin en büyük gölü, dünyanın en büyük sodalı gölü, inci kefali", num: 19 },
-            { id: 'l_20', name: "Çıldır Gölü", type: "Lav Set", feat: "Kışın tamamen donarak üzerinde yürünebilen göl", num: 20 }
+            { id: 'l_20', name: "Aktaş Gölü", type: "Lav Set", feat: "Gürcistan Sınır gölü,kapalı havza ", num: 20 }
         ];
 
         let savedCoords = JSON.parse(localStorage.getItem('golerCoordsCoreZen')) || {};
